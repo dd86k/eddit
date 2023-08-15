@@ -66,7 +66,7 @@ bool ffreadonly(string name)
         exists = false;
     }
 
-    version (Win32)
+    version (Windows)
     {
         return (a & FILE_ATTRIBUTE_READONLY) != 0;
     }

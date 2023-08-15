@@ -57,7 +57,7 @@ import terminal;
 import line;
 import mouse;
 import console;
-import regexp;
+import undead.regexp;
 
 int     currow;                         /* Working cursor row           */
 int     fillcol;                        /* Current fill column          */
@@ -472,7 +472,7 @@ int gargi;
 
 private int c;
 
-int main(string[] args)
+void main(string[] args)
 {
     bool   f;
     int    n;
@@ -521,7 +521,6 @@ int main(string[] args)
         }
         execute(0, c, f, n);                       /* Do it.               */
     }
-    return 0;
 }
 
 /******************************

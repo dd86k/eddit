@@ -35,7 +35,7 @@ import main;
 import buffer;
 import basic;
 import terminal;
-import regexp;
+import undead.regexp;
 
 enum CASESENSITIVE = true;      /* TRUE means case sensitive            */
 enum WORDPREFIX = 'W' & 0x1F;   // prefix to trigger word search
@@ -98,7 +98,7 @@ int forwsearch(bool f, int n)
             {
                 /* found it */
                 curwp.w_dotp  = clp;
-                curwp.w_doto  = regExp.pmatch[0].rm_eo;
+                curwp.w_doto  = cast(int)regExp.pmatch[0].rm_eo;
                 curwp.w_flag |= WFMOVE;
                 curwp.w_flag |= WFHARD;
                 winSearchPat = curwp;
@@ -263,10 +263,10 @@ again:
  * folded out. The "pc" is from the pattern.
  */
 
-bool eq(int bc, int pc)
+bool eq(int bc, int pc, bool cs = false)
 {
-    if (CASESENSITIVE)
-        return bc == pc;
+    /*if (CASESENSITIVE)
+        return bc == pc;*/
 
     if (bc>='a' && bc<='z')
         bc -= 0x20;
@@ -412,9 +412,9 @@ again:
                 continue;
             }
             /* found it */
-            cbo = regExp.pmatch[0].rm_so + 1; // start of match + 1
+            cbo = cast(int)regExp.pmatch[0].rm_so + 1; // start of match + 1
             tlp = clp;
-            tbo = regExp.pmatch[0].rm_eo; // end of match + 1
+            tbo = cast(int)regExp.pmatch[0].rm_eo; // end of match + 1
             i = tbo - cbo + 1;
         }
         else
