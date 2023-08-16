@@ -5,3 +5,7 @@
 bin
 obj
 .dub/version.json
+*.exe
+*.pdb
+*.dll
+/med
