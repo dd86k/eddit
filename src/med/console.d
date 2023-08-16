@@ -16,6 +16,8 @@ module console;
 
 version (Windows)
 {
+    
+pragma(lib, "user32.lib");
 
 import std.stdio;
 import core.stdc.stdlib;
