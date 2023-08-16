@@ -21,6 +21,8 @@ import core.stdc.stdarg;
 import core.stdc.stdio;
 import core.sys.windows.winbase :
     CreateFileA, WriteFile, CloseHandle,
+    GetStdHandle,
+    STD_OUTPUT_HANDLE,
     OPEN_EXISTING, OPEN_ALWAYS;
 import core.sys.windows.winnt :
     GENERIC_READ, GENERIC_WRITE,
@@ -86,20 +88,24 @@ int disp_putc(int c)
 //void disp_levelblockpoke(int,int,int,int,uint,uint *,uint,uint *,uint);
 void disp_open()
 {
-    disp_state.handle = CreateFileA(
-        "CONOUT$",      // lpFileName
-        GENERIC_WRITE,  // dwDesiredAccess
-        FILE_SHARE_READ | FILE_SHARE_WRITE, // dwShareMode
-        null,           // lpSecurityAttributes
-        OPEN_EXISTING,  // dwCreationDisposition
-        0,              // dwFlagsAndAttributes
-        null            // hTemplateFile
-    );
+    disp_state.handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    
     CONSOLE_SCREEN_BUFFER_INFO screen = void;
     GetConsoleScreenBufferInfo(disp_state.handle, &screen);
     disp_state.attr = screen.wAttributes;
     disp_state.numrows = screen.srWindow.Bottom - screen.srWindow.Top + 1;
     disp_state.numcols = screen.srWindow.Right  - screen.srWindow.Left + 1;
+    
+    disp_move(0, 0);
+    COORD coord;
+    uint num = void;
+    FillConsoleOutputCharacterA(disp_state.handle,
+        ' ',
+        screen.dwSize.X * screen.dwSize.Y,
+        coord,
+        &num);
+    
+    disp_move(0, 0);
 }
 void disp_puts(const(char) *str)
 {
@@ -108,6 +114,12 @@ GET:
     if (c == 0) return;
     ++str;
     disp_putc(c);
+    ++disp_state.cursorcol;
+    if (disp_state.cursorcol >= disp_state.numcols)
+    {
+        disp_state.cursorcol = 0;
+        ++disp_state.cursorrow;
+    }
     goto GET;
 }
 //void disp_box(int,int,uint,uint,uint,uint);
@@ -124,17 +136,25 @@ void disp_move(int row, int col)
 }
 void disp_flush()
 {
+    //TODO: refresh col/row count?
     FlushConsoleInputBuffer(disp_state.handle);
 }
 // Erase to end of line
 void disp_eeol()
 {
-    
+    int count = disp_state.numcols - disp_state.cursorcol;
+    for (int i; i < count; ++i)
+        disp_putc(' ');
 }
 // Erase to end of page
 void disp_eeop()
 {
+    int total = disp_state.numcols * disp_state.numrows;
+    int pos   = disp_state.cursorcol * disp_state.cursorrow;
     
+    int count = total - pos;
+    for (int i; i < count; ++i)
+        disp_putc(' ');
 }
 // Start standout mode
 void disp_startstand()
