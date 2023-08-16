@@ -17,8 +17,18 @@ module disp;
 version (Windows)
 {
 
-extern (C)
-{
+import core.stdc.stdarg;
+import core.stdc.stdio;
+import core.sys.windows.winbase :
+    CreateFileA, WriteFile, CloseHandle,
+    OPEN_EXISTING, OPEN_ALWAYS;
+import core.sys.windows.winnt :
+    GENERIC_READ, GENERIC_WRITE,
+    FILE_SHARE_READ, FILE_SHARE_WRITE,
+    TRUE, FALSE;
+import core.sys.windows.wincon;
+
+extern (C):
 
 struct disp_t
 { align(1):
@@ -43,36 +53,118 @@ struct disp_t
         }
     }
     void *handle;
+    
+    short attr;
 }
 
-extern __gshared disp_t disp_state;
+__gshared disp_t disp_state;
 
-int     disp_printf(char *,...);
-int     disp_getmode();
-int     disp_getattr();
-int     disp_putc(int);
-void    disp_levelblockpoke(int,int,int,int,uint,uint *,uint,uint *,uint);
-void    disp_open();
-void    disp_puts(const char *);
-void    disp_box(int,int,uint,uint,uint,uint);
-void    disp_close();
-void    disp_move(int,int);
-void    disp_flush();
-void    disp_eeol();
-void    disp_eeop();
-void    disp_startstand();
-void    disp_endstand();
-void    disp_setattr(int);
-void    disp_setcursortype(int);
-void    disp_pokew(int,int,ushort);
-void    disp_scroll(int,uint,uint,uint,uint,uint);
-void    disp_setmode(ubyte);
-void    disp_peekbox(ushort *,uint,uint,uint,uint);
-void    disp_pokebox(ushort *,uint,uint,uint,uint);
-void    disp_fillbox(uint,uint,uint,uint,uint);
-void    disp_hidecursor();
-void    disp_showcursor();
-ushort  disp_peekw(int,int);
+int disp_printf(const(char) *format, ...)
+{
+    enum BUFLEN = 256;
+    char[BUFLEN] buf = void;
+    
+    va_list args = void;
+    va_start(args, format);
+    
+    int n = vsnprintf(buf.ptr, BUFLEN, format, args);
+    for (int i; i < n; ++i)
+    {
+        disp_putc(buf[i]);
+    }
+    
+    return n;
+}
+int disp_getmode() { return disp_state.mode; }
+int disp_getattr() { return 0; }
+int disp_putc(int c)
+{
+    uint r = void;
+    WriteConsoleA(disp_state.handle, &c, 1, &r, null);
+    return r;
+}
+//void disp_levelblockpoke(int,int,int,int,uint,uint *,uint,uint *,uint);
+void disp_open()
+{
+    disp_state.handle = CreateFileA(
+        "CONOUT$",      // lpFileName
+        GENERIC_WRITE,  // dwDesiredAccess
+        FILE_SHARE_READ | FILE_SHARE_WRITE, // dwShareMode
+        null,           // lpSecurityAttributes
+        OPEN_EXISTING,  // dwCreationDisposition
+        0,              // dwFlagsAndAttributes
+        null            // hTemplateFile
+    );
+    CONSOLE_SCREEN_BUFFER_INFO screen = void;
+    GetConsoleScreenBufferInfo(disp_state.handle, &screen);
+    disp_state.attr = screen.wAttributes;
+    disp_state.numrows = screen.srWindow.Bottom - screen.srWindow.Top + 1;
+    disp_state.numcols = screen.srWindow.Right  - screen.srWindow.Left + 1;
+}
+void disp_puts(const(char) *str)
+{
+GET:
+    char c = *str;
+    if (c == 0) return;
+    ++str;
+    disp_putc(c);
+    goto GET;
+}
+//void disp_box(int,int,uint,uint,uint,uint);
+void disp_close()
+{
+    CloseHandle(disp_state.handle);
+}
+void disp_move(int row, int col)
+{
+    COORD c = void;
+    disp_state.cursorcol = c.X = cast(short)col;
+    disp_state.cursorrow = c.Y = cast(short)row;
+    SetConsoleCursorPosition(disp_state.handle, c);
+}
+void disp_flush()
+{
+    FlushConsoleInputBuffer(disp_state.handle);
+}
+// Erase to end of line
+void disp_eeol()
+{
+    
+}
+// Erase to end of page
+void disp_eeop()
+{
+    
+}
+// Start standout mode
+void disp_startstand()
+{
+    with (disp_state)
+        SetConsoleTextAttribute(handle, attr | COMMON_LVB_REVERSE_VIDEO);
+}
+// End standout mode
+void disp_endstand()
+{
+    with (disp_state)
+        SetConsoleTextAttribute(handle, attr);
+}
+//void disp_setattr(int);
+void disp_setcursortype(int cursor)
+{
+    CONSOLE_CURSOR_INFO info = void;
+    info.bVisible = TRUE;
+    info.dwSize = cursor;
+    SetConsoleCursorInfo(disp_state.handle, &info);
+}
+//void disp_pokew(int,int,ushort);
+//void disp_scroll(int,uint,uint,uint,uint,uint);
+void disp_setmode(ubyte mode) { disp_state.mode = mode; }
+//void disp_peekbox(ushort *,uint,uint,uint,uint);
+//void disp_pokebox(ushort *,uint,uint,uint,uint);
+//void disp_fillbox(uint,uint,uint,uint,uint);
+//void disp_hidecursor();
+//void disp_showcursor();
+//ushort disp_peekw(int,int);
 
 enum
 {
@@ -87,8 +179,6 @@ enum
     DISP_CURSORBLOCK        = 100,
     DISP_CURSORHALF         = 50,
     DISP_CURSORUL           = 20,
-}
-
 }
 
 }
