@@ -9,8 +9,10 @@ This fork will respect the wish to keep the code on the public domain, while
 modernizing the code and turning the editor more GNU nano-like.
 
 Changes:
-- [ ] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
+- [x] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
 - [ ] Document architecture, functions, enums.
+- [ ] Add `--version`.
+- [ ] Add `--help`.
 - [ ] Force dark theme regardless of platform.
 - [ ] Make theme presets.
 - [ ] Change keybinds to GNU nano.

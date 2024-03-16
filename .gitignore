@@ -8,4 +8,5 @@ obj
 *.exe
 *.pdb
 *.dll
-/med
+/dtex
+*.json
