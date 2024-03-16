@@ -1,5 +1,24 @@
+# dtex, fork of med
 
-## med, Micro Emacs in D
+This is an initial fork of [Walter's µEmacs](https://github.com/DigitalMars/med)
+with my [Win64 patches](https://github.com/dd86k/med64).
+
+Why? To have a small, quick editor working natively on Windows and Linux.
+
+This fork will respect the wish to keep the code on the public domain, while
+modernizing the code and turning the editor more GNU nano-like.
+
+Changes:
+- [ ] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
+- [ ] Document architecture, functions, enums.
+- [ ] Force dark theme regardless of platform.
+- [ ] Make theme presets.
+- [ ] Change keybinds to GNU nano.
+- [ ] Make keybind presets.
+- [ ] Change statusbar to nano's minibar.
+- [ ] Add support for a row column.
+
+# Original README
 
 This is my version of MicroEmacs, based on the public
 domain version by Dave Conroy. I like it because it is
