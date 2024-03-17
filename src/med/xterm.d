@@ -240,7 +240,7 @@ struct TERM
          * that failed, then we have to send the characters as if they
          * were pressed individually.
          */
-    start:
+    //start:
         /*
          * Continue following the LONGKEY structure sequence until
          * either there is a complete match, or there is a complete

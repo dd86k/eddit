@@ -746,7 +746,6 @@ version (Posix)
     }
 
   no_scroll_possible:
-    ;
 }
     /* Make sure that the physical and virtual displays agree. Unlike before,
      * the "updateline" code is only called with a line that has been updated
@@ -1290,14 +1289,14 @@ extern (C) void mlwrite(const(char)* fmt, ...)
     int savecol;
 
     va_start(ap, fmt);
-    auto n = vsnprintf(buffer.ptr, buffer.length, fmt, ap);
+    int n = vsnprintf(buffer.ptr, buffer.length, fmt, ap);
     va_end(ap);
 
     // http://www.cplusplus.com/reference/cstdio/vsnprintf/
     if (n <= 0)
         n = 0;
     else if (n >= buffer.length)
-        n = buffer.length - 1;
+        n = cast(int)buffer.length - 1;
 
     vtmove(term.t_nrow - 1, 0);
     attr = config.normattr;

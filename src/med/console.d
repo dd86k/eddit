@@ -353,7 +353,7 @@ static uint win32_keytran(KEY_EVENT_RECORD *pkey)
     {
         c = (pkey.wVirtualScanCode << 8) & 0xFF00;
     }
-Lret:
+    
     return c;
 }
 
@@ -376,12 +376,12 @@ void ttyield()
         DWORD cNumRead;
 
         if (!ReadConsoleInputA(hStdin,&lookaheadir,1,&cNumRead))
-        {   printf("readconsoleinput\n");
-            goto Lret;
+        {
+            printf("readconsoleinput\n");
+            return;
         }
     }
     lookahead = 1;
-Lret: ;
 }
 
 /*************************************

@@ -218,7 +218,8 @@ immutable KEYTAB[] keytab =
 [
        { CTRL('@'),              &ctrlg}, /*basic_setmark*/
        { CTRL('A'),              &gotobol},
-       { CTRL('B'),              &backchar},
+       //{ CTRL('B'),              &backchar},
+       { CTRL('B'),              &backsearch},
        { CTRL('D'),              &random_forwdel},
        { CTRL('E'),              &gotoeol},
        { CTRL('F'),              &Dsearch},
@@ -234,7 +235,8 @@ immutable KEYTAB[] keytab =
        { CTRL('P'),              &backline},
        //{ CTRL('Q'),              &random_quote},   /* Often unreachable    */
        { CTRL('Q'),              &quit},
-       { CTRL('R'),              &backsearch},
+       //{ CTRL('R'),              &backsearch},
+       { CTRL('R'),              &replacestring},
        //{ CTRL('S'),              &forwsearch},     /* Often unreachable    */
        { CTRL('S'),              &filesave},
        { CTRL('T'),              &random_twiddle},
@@ -460,7 +462,7 @@ immutable ushort[2][] ctlx_tab =
 struct CMDTAB
 {   ushort    ktprefix;           /* prefix key value                     */
     immutable ushort[2][]  kt;    /* which translation table              */
-};
+}
 
 CMDTAB[3] cmdtab =
 [
@@ -473,7 +475,7 @@ CMDTAB[3] cmdtab =
 string[] gargs;
 int gargi;
 
-private int c;
+private int comm;
 
 void main(string[] args)
 {
@@ -500,19 +502,19 @@ void main(string[] args)
     while (1)
     {
         update();                               /* Fix up the screen    */
-        c = getkey();
+        comm = getkey();
         if (mpresf != FALSE)            /* if there is stuff in message line */
         {   mlerase();                  /* erase it                     */
             update();
         }
         f = FALSE;
         n = 1;
-        if (c == CTRL('U'))                     /* ^U, start argument   */
+        if (comm == CTRL('U'))                     /* ^U, start argument   */
         {   f = TRUE;
             n = getarg();
         }
         if (kbdmip != null) {                   /* Save macro strokes.  */
-                if (c!=CMD_ENDMACRO && kbdmip>&kbdm[$-6]) {
+                if (comm !=CMD_ENDMACRO && kbdmip>&kbdm[$-6]) {
                         ctrlg(FALSE, 0);
                         continue;
                 }
@@ -520,9 +522,9 @@ void main(string[] args)
                         *kbdmip++ = CTRL('U');
                         *kbdmip++ = n;
                 }
-                *kbdmip++ = c;
+                *kbdmip++ = comm;
         }
-        execute(0, c, f, n);                       /* Do it.               */
+        execute(0, comm, f, n);                       /* Do it.               */
     }
 }
 
@@ -538,14 +540,14 @@ int getarg()
     n = 4;                          /* with argument of 4 */
     mflag = 0;                      /* that can be discarded. */
     mlwrite("Arg: 4");
-    while ((c=getkey()) >='0' && c<='9' || c==CTRL('U') || c=='-'){
-        if (c == CTRL('U'))
+    while ((comm = getkey()) >='0' && comm <='9' || comm ==CTRL('U') || comm =='-'){
+        if (comm == CTRL('U'))
             n = n*4;
         /*
          * If dash, and start of argument string, set arg.
          * to -1.  Otherwise, insert it.
          */
-        else if (c == '-') {
+        else if (comm == '-') {
             if (mflag)
                 break;
             n = 0;
@@ -560,7 +562,7 @@ int getarg()
                 n = 0;
                 mflag = 1;
             }
-            n = 10*n + c - '0';
+            n = 10*n + comm - '0';
         }
         mlwrite("Arg: %d", (mflag >=0) ? n : (n ? -n : -1));
     }
