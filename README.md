@@ -11,14 +11,30 @@ modernizing the code and turning the editor more GNU nano-like.
 Changes:
 - [x] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
 - [ ] Document architecture, functions, enums.
+- [ ] Format source to DStyle.
+- [ ] Remove usage of `auto`. Promote usage of `alias`.
 - [ ] Add `--version`.
 - [ ] Add `--help`.
+- [ ] Correct warnings emitted by dscanner.
 - [ ] Force dark theme regardless of platform.
 - [ ] Make theme presets.
-- [ ] Change keybinds to GNU nano.
-- [ ] Make keybind presets.
+- [ ] Make keybinds configurable.
+- [ ] Add support for duplicating line.
 - [ ] Change statusbar to nano's minibar.
 - [ ] Add support for a row column.
+- [ ] Optional: Convert to BetterC
+
+## Default Keybinds
+
+Some of the default key bindings were redefined.
+
+| Key | Command | Description |
+|---|---|---|
+| HOME | `gotobol` | Go to start of line. |
+| END | `gotoeol` | Go to end of line. |
+| CTRL+Q | `quit` | Quit. |
+| CTRL+F | `Dsearch` | Search. |
+| CTRL+N | `Dsearchagain` | Search again. |
 
 # Original README
 

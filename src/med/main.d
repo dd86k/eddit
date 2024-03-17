@@ -211,33 +211,36 @@ struct KEYTAB {
     int function(bool, int) k_fp; /* Routine to handle it         */
 }
 
-immutable KEYTAB[]  keytab =
+// List of key maps.
+//
+// This maps a key, or a combination or keys, to an action.
+immutable KEYTAB[] keytab =
 [
-        /* Definitions common to all versions   */
        { CTRL('@'),              &ctrlg}, /*basic_setmark*/
        { CTRL('A'),              &gotobol},
        { CTRL('B'),              &backchar},
-       { CTRL('C'),              &quit},
        { CTRL('D'),              &random_forwdel},
        { CTRL('E'),              &gotoeol},
-       { CTRL('F'),              &forwchar},
+       { CTRL('F'),              &Dsearch},
        { CTRL('G'),              &ctrlg},
        { CTRL('H'),              &random_backdel},
        { CTRL('I'),              &random_tab},
-       { CTRL('J'),              &Ddelline},
-       { CTRL('K'),              &random_kill},
+       { CTRL('K'),              &Ddelline},
+       //{ CTRL('J'),              &random_kill},
        { CTRL('L'),              &window_refresh},
        { CTRL('M'),              &random_newline},
-       { CTRL('N'),              &forwline},
+       { CTRL('N'),              &Dsearchagain},
        { CTRL('O'),              &random_openline},
        { CTRL('P'),              &backline},
-       { CTRL('Q'),              &random_quote},   /* Often unreachable    */
+       //{ CTRL('Q'),              &random_quote},   /* Often unreachable    */
+       { CTRL('Q'),              &quit},
        { CTRL('R'),              &backsearch},
-       { CTRL('S'),              &forwsearch},     /* Often unreachable    */
+       //{ CTRL('S'),              &forwsearch},     /* Often unreachable    */
+       { CTRL('S'),              &filesave},
        { CTRL('T'),              &random_twiddle},
        { CTRL('V'),              &forwpage},
        { CTRL('W'),              &search_paren},
-       { CTRL('Y'),              &random_yank},
+       { CTRL('U'),              &random_yank},     // Paste
        { 0x7F,                   &random_backdel},
 /+
         /* Unused definitions from original microEMACS */
@@ -279,8 +282,8 @@ immutable KEYTAB[]  keytab =
         {DelKEY,                 &random_forwdel},
         {PgUpKEY,                &backpage},
         {PgDnKEY,                &forwpage},
-        {HOMEKEY,                &window_mvup},
-        {ENDKEY,                 &window_mvdn},
+        {HOMEKEY,                &gotobol},
+        {ENDKEY,                 &gotoeol},
         {CtrlRTKEY,              &word_forw},
         {CtrlLFKEY,              &word_back},
         {CtrlHome,               &gotobob},
@@ -290,8 +293,8 @@ immutable KEYTAB[]  keytab =
         {0x8001,         &spawn_pipe},
         {0x8002,         &spawn_filter},
         {0x8003,         &random_showcpos},
-        {0x8004,         &ctlxlp},
-        {CMD_ENDMACRO,   &ctlxrp},
+        //{0x8004,         &ctlxlp},
+        //{CMD_ENDMACRO,   &ctlxrp},
         {0x8006,         &random_decindent},
         {0x8007,         &random_incindent},
         {0x8008,         &window_only},
@@ -300,7 +303,7 @@ immutable KEYTAB[]  keytab =
         {0x800B,         &window_split},
         {0x800C,         &usebuffer},
         {0x800D,         &delwind},
-        {0x800E,         &ctlxe},
+        //{0x800E,         &ctlxe},
         {0x800F,         &random_setfillcol},
         {0x8010,         &buffer.killbuffer},
         {0x8011,         &window_next},
