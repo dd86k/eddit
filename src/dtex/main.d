@@ -214,248 +214,249 @@ struct KEYTAB
 //
 // This maps a key, or a combination or keys, to an action.
 immutable KEYTAB[] keytab =
-    [
-        {CTRL('@'),                 &ctrlg }, /*basic_setmark*/
-        {CTRL('A'),                 &gotobol },
-        //{ CTRL('B'),              &backchar },
-        {CTRL('B'),                 &backsearch },
-        {CTRL('D'),                 &random_forwdel },
-        {CTRL('E'),                 &gotoeol },
-        {CTRL('F'),                 &Dsearch },
-        {CTRL('G'),                 &ctrlg },
-        {CTRL('H'),                 &random_backdel },
-        {CTRL('I'),                 &random_tab },
-        {CTRL('K'),                 &Ddelline },
-        //{ CTRL('J'),              &random_kill },
-        {CTRL('L'),                 &window_refresh },
-        {CTRL('M'),                 &random_newline },
-        {CTRL('N'),                 &Dsearchagain },
-        {CTRL('O'),                 &random_openline },
-        {CTRL('P'),                 &backline },
-        //{ CTRL('Q'),              &random_quote },   /* Often unreachable    */
-        {CTRL('Q'),                 &quit },
-        //{ CTRL('R'),              &backsearch },
-        {CTRL('R'),                 &replacestring },
-        //{ CTRL('S'),              &forwsearch },     /* Often unreachable    */
-        {CTRL('S'),                 &filesave },
-        {CTRL('T'),                 &random_twiddle },
-        {CTRL('V'),                 &forwpage },
-        {CTRL('W'),                 &search_paren },
-        {CTRL('U'),                 &random_yank }, // Paste
-        {0x7F,                      &random_backdel },
+[
+    { CTRL('@'),                 &ctrlg }, /*basic_setmark*/
+    { CTRL('A'),                 &gotobol },
+    //{ CTRL('B'),              &backchar },
+    { CTRL('B'),                 &backsearch },
+    { CTRL('D'),                 &random_forwdel },
+    { CTRL('E'),                 &gotoeol },
+    { CTRL('F'),                 &Dsearch },
+    { CTRL('G'),                 &ctrlg },
+    { CTRL('H'),                 &random_backdel },
+    { CTRL('I'),                 &random_tab },
+    { CTRL('K'),                 &Ddelline },
+    //{ CTRL('J'),              &random_kill },
+    { CTRL('L'),                 &window_refresh },
+    { CTRL('M'),                 &random_newline },
+    { CTRL('N'),                 &Dsearchagain },
+    { CTRL('O'),                 &random_openline },
+    { CTRL('P'),                 &backline },
+    //{ CTRL('Q'),              &random_quote },   /* Often unreachable    */
+    { CTRL('Q'),                 &quit },
+    //{ CTRL('R'),              &backsearch },
+    { CTRL('R'),                 &replacestring },
+    //{ CTRL('S'),              &forwsearch },     /* Often unreachable    */
+    { CTRL('S'),                 &filesave },
+    { CTRL('T'),                 &random_twiddle },
+    { CTRL('V'),                 &forwpage },
+    { CTRL('W'),                 &search_paren },
+    { CTRL('U'),                 &random_yank }, // Paste
+    { 0x7F,                      &random_backdel },
 /+
-        /* Unused definitions from original microEMACS */
-       { CTRL('C'),              &spawncli},       /* Run CLI in subjob.   */
-       { CTRL('J'),              &random_indent},
-       { CTRL('W'),              &region_kill},
-       { CTRL('Z'),              &quickexit},      /* quick save and exit  */
+    /* Unused definitions from original microEMACS */
+    { CTRL('C'),              &spawncli},       /* Run CLI in subjob.   */
+    { CTRL('J'),              &random_indent},
+    { CTRL('W'),              &region_kill},
+    { CTRL('Z'),              &quickexit},      /* quick save and exit  */
 +/
-        { CTRL('Z'),                &spawncli }, /* Run CLI in subjob.   */
-        { F2KEY,                    &Dsearchagain },
-        { F3KEY,                    &search_paren },
-        { F4KEY,                    &Dsearch },
-        { F5KEY,                    &basic_nextline },
-        { F6KEY,                    &window_next },
-        { F7KEY,                    &basic_setmark },
-        { F8KEY,                    &region_copy },
-        { F9KEY,                    &region_kill },
-        { F10KEY,                   &random_yank },
-        { F11KEY,                   &ctlxe },
-        { F12KEY,                   &macrotoggle },
-        { AltF1KEY,                 &display_norm_bg },
-        { AltF2KEY,                 &display_norm_fg },
-        { AltF3KEY,                 &display_mode_bg },
-        { AltF5KEY,                 &display_mark_fg },
-        { AltF6KEY,                 &display_mark_bg },
-        { AltF4KEY,                 &display_mode_fg },
-        { AltF7KEY,                 &display_eol_bg },
-        { AltF9KEY,                 &random_decindent },
-        { AltF10KEY,                &random_incindent },
-        { ALTB,                     &buffer_next },
-        { ALTC,                     &main_saveconfig },
-        { ALTX,                     &normexit },
-        { ALTZ,                     &spawn_pipe },
-        { RTKEY,                    &forwchar },
-        { LTKEY,                    &backchar },
-        { DNKEY,                    &forwline },
-        { UPKEY,                    &backline },
-        { InsKEY,                   &toggleinsert },
-        { DelKEY,                   &random_forwdel },
-        { PgUpKEY,                  &backpage },
-        { PgDnKEY,                  &forwpage },
-        { HOMEKEY,                  &gotobol },
-        { ENDKEY,                   &gotoeol },
-        { CtrlRTKEY,                &word_forw },
-        { CtrlLFKEY,                &word_back },
-        { CtrlHome,                 &gotobob },
-        { CtrlEnd,                  &gotoeob },
+    { CTRL('Z'),                &spawncli }, /* Run CLI in subjob.   */
+    { F2KEY,                    &Dsearchagain },
+    { F3KEY,                    &search_paren },
+    { F4KEY,                    &Dsearch },
+    { F5KEY,                    &basic_nextline },
+    { F6KEY,                    &window_next },
+    { F7KEY,                    &basic_setmark },
+    { F8KEY,                    &region_copy },
+    { F9KEY,                    &region_kill },
+    { F10KEY,                   &random_yank },
+    { F11KEY,                   &ctlxe },
+    { F12KEY,                   &macrotoggle },
+    { AltF1KEY,                 &display_norm_bg },
+    { AltF2KEY,                 &display_norm_fg },
+    { AltF3KEY,                 &display_mode_bg },
+    { AltF5KEY,                 &display_mark_fg },
+    { AltF6KEY,                 &display_mark_bg },
+    { AltF4KEY,                 &display_mode_fg },
+    { AltF7KEY,                 &display_eol_bg },
+    { AltF9KEY,                 &random_decindent },
+    { AltF10KEY,                &random_incindent },
+    { ALTB,                     &buffer_next },
+    { ALTC,                     &main_saveconfig },
+    { ALTX,                     &normexit },
+    { ALTZ,                     &spawn_pipe },
+    { RTKEY,                    &forwchar },
+    { LTKEY,                    &backchar },
+    { DNKEY,                    &forwline },
+    { UPKEY,                    &backline },
+    { InsKEY,                   &toggleinsert },
+    { DelKEY,                   &random_forwdel },
+    { PgUpKEY,                  &backpage },
+    { PgDnKEY,                  &forwpage },
+    { HOMEKEY,                  &gotobol },
+    { ENDKEY,                   &gotoeol },
+    { CtrlRTKEY,                &word_forw },
+    { CtrlLFKEY,                &word_back },
+    { CtrlHome,                 &gotobob },
+    { CtrlEnd,                  &gotoeob },
 
-        /* Commands with a special key value    */
-        { 0x8001,                   &spawn_pipe},
-        { 0x8002,                   &spawn_filter},
-        { 0x8003,                   &random_showcpos},
-        //{0x8004,         &ctlxlp},
-        //{CMD_ENDMACRO,   &ctlxrp},
-        { 0x8006,                   &random_decindent},
-        { 0x8007,                   &random_incindent},
-        { 0x8008,                   &window_only},
-        { 0x8009,                   &removemark},
-        { 0x800A,                   &spawn.spawn}, /* Run 1 command.       */
-        { 0x800B,                   &window_split },
-        { 0x800C,                   &usebuffer},
-        { 0x800D,                   &delwind},
-        //{0x800E,         &ctlxe},
-        { 0x800F,                   &random_setfillcol},
-        { 0x8010,                   &buffer.killbuffer},
-        { 0x8011,                   &window_next},
-        { 0x8012,                   &window_prev},
-        { 0x8013,                   &random_quote},
-        { 0x8014,                   &buffer_next},
-        { 0x8015,                   &window_enlarge},
-        { 0x8016,                   &listbuffers},
-        { 0x8017,                   &filename},
-        { 0x8018,                   &filemodify},
-        { 0x8019,                   &window_mvdn},
-        { 0x801A,                   &random_deblank},
-        { 0x801B,                   &window_mvup},
-        { 0x801C,                   &fileread},
-        { 0x801D,                   &filesave}, /* Often unreachable    */
-        { 0x801E,                   &window_reposition },
-        { 0x801F,                   &filevisit},
-        { 0x8020,                   &filewrite},
-        { 0x8021,                   &swapmark},
-        { 0x8022,                   &window_shrink},
+    /* Commands with a special key value    */
+    //TODO: Make 0x8000 a "SPECIAL" constant or template
+    { 0x8001,                   &spawn_pipe},
+    { 0x8002,                   &spawn_filter},
+    { 0x8003,                   &random_showcpos},
+    //{0x8004,         &ctlxlp},
+    //{CMD_ENDMACRO,   &ctlxrp},
+    { 0x8006,                   &random_decindent},
+    { 0x8007,                   &random_incindent},
+    { 0x8008,                   &window_only},
+    { 0x8009,                   &removemark},
+    { 0x800A,                   &spawn.spawn}, /* Run 1 command.       */
+    { 0x800B,                   &window_split },
+    { 0x800C,                   &usebuffer},
+    { 0x800D,                   &delwind},
+    //{0x800E,         &ctlxe},
+    { 0x800F,                   &random_setfillcol},
+    { 0x8010,                   &buffer.killbuffer},
+    { 0x8011,                   &window_next},
+    { 0x8012,                   &window_prev},
+    { 0x8013,                   &random_quote},
+    { 0x8014,                   &buffer_next},
+    { 0x8015,                   &window_enlarge},
+    { 0x8016,                   &listbuffers},
+    { 0x8017,                   &filename},
+    { 0x8018,                   &filemodify},
+    { 0x8019,                   &window_mvdn},
+    { 0x801A,                   &random_deblank},
+    { 0x801B,                   &window_mvup},
+    { 0x801C,                   &fileread},
+    { 0x801D,                   &filesave}, /* Often unreachable    */
+    { 0x801E,                   &window_reposition },
+    { 0x801F,                   &filevisit},
+    { 0x8020,                   &filewrite},
+    { 0x8021,                   &swapmark},
+    { 0x8022,                   &window_shrink},
 
-        { 0x8023,                   &delbword},
-        { 0x8024,                   &random_opttab},
-        { 0x8025,                   &basic_setmark},
-        { 0x8026,                   &gotoeob},
-        { 0x8027,                   &gotobob},
-        { 0x8028,                   &region_copy},
-        { 0x8029,                   &region_kill},
-        { 0x802A,                   &word_back},
-        { 0x802B,                   &capword},
-        { 0x802C,                   &delfword},
-        { 0x802D,                   &word_forw},
-        { 0x802E,                   &misc_lower},
-        { 0x802F,                   &queryreplacestring},
-        { 0x8030,                   &replacestring},
-        { 0x8031,                   &misc_upper},
-        { 0x8032,                   &backpage},
-        { 0x8033,                   &word_select},
-        { 0x8034,                   &Dadvance},
-        { 0x8035,                   &Dbackup},
-        { 0x8036,                   &random_deblank},
-        
-        { 0x8037,                   &Dinsertdate},
-        { 0x8038,                   &Dinsertfile},
-        { 0x8039,                   &gotoline},
-        { 0x803A,                   &fileunmodify},
-        { 0x803B,                   &filenext},
-        { 0x803C,                   &quit},
-        { 0x803D,                   &normexit},
-        { 0x803E,                   &Dundelline},
-        { 0x803F,                   &Dsearch},
-        { 0x8040,                   &Dundelword},
-        { 0x8041,                   &random_undelchar},
-        { 0x8042,                   &random_openline},
-        { 0x8043,                   &random_kill},
-        { 0x8044,                   &region_togglemode},
-        { 0x8045,                   &Dcppcomment},
-        { 0x8046,                   &random_hardtab},
-        { 0x8047,                   &word_wrap_line},
-        { 0x8048,                   &help},
-        { 0x8049,                   &openBrowser},
-        { 0x804A,                   &scrollUnicode},
-    ];
+    { 0x8023,                   &delbword},
+    { 0x8024,                   &random_opttab},
+    { 0x8025,                   &basic_setmark},
+    { 0x8026,                   &gotoeob},
+    { 0x8027,                   &gotobob},
+    { 0x8028,                   &region_copy},
+    { 0x8029,                   &region_kill},
+    { 0x802A,                   &word_back},
+    { 0x802B,                   &capword},
+    { 0x802C,                   &delfword},
+    { 0x802D,                   &word_forw},
+    { 0x802E,                   &misc_lower},
+    { 0x802F,                   &queryreplacestring},
+    { 0x8030,                   &replacestring},
+    { 0x8031,                   &misc_upper},
+    { 0x8032,                   &backpage},
+    { 0x8033,                   &word_select},
+    { 0x8034,                   &Dadvance},
+    { 0x8035,                   &Dbackup},
+    { 0x8036,                   &random_deblank},
+    
+    { 0x8037,                   &Dinsertdate},
+    { 0x8038,                   &Dinsertfile},
+    { 0x8039,                   &gotoline},
+    { 0x803A,                   &fileunmodify},
+    { 0x803B,                   &filenext},
+    { 0x803C,                   &quit},
+    { 0x803D,                   &normexit},
+    { 0x803E,                   &Dundelline},
+    { 0x803F,                   &Dsearch},
+    { 0x8040,                   &Dundelword},
+    { 0x8041,                   &random_undelchar},
+    { 0x8042,                   &random_openline},
+    { 0x8043,                   &random_kill},
+    { 0x8044,                   &region_togglemode},
+    { 0x8045,                   &Dcppcomment},
+    { 0x8046,                   &random_hardtab},
+    { 0x8047,                   &word_wrap_line},
+    { 0x8048,                   &help},
+    { 0x8049,                   &openBrowser},
+    { 0x804A,                   &scrollUnicode},
+];
 
 /* Translation table from 2 key sequence to single value        */
 immutable ushort[2][] altf_tab =
 [
-    ['B',       0x8016], /* listbuffers          */
-    ['D',       0x8037], /* Dinsertdate          */
-    ['F',       0x8017], /* filename             */
-    ['I',       0x8038], /* Dinsertfile          */
-    ['M',       0x8018], /* filemodify           */
-    ['N',       0x803B], /* filenext             */
-    ['Q',       0x803C], /* quit                 */
-    ['R',       0x801C], /* fileread             */
-    ['S',       0x801D], /* filesave             */
-    ['T',       0x8046], // random_hardtab
-    ['U',       0x803A], /* fileunmodify         */
-    ['V',       0x801F], /* filevisit            */
-    ['W',       0x8020], /* filewrite            */
-    ['X',       0x803D], /* normexit             */
-    [F2KEY,     0x803E], /* Dundelline           */
-    [F4KEY,     0x803F], /* Dsearch              */
-    [CtrlRTKEY, 0x8040], /* Dundelword           */
-    [CtrlLFKEY, 0x8040], /* Dundelword           */
-    [DelKEY,    0x8041], /* random_undelchar     */
-    [InsKEY,    0x8042], /* random_openline      */
+    [ 'B',          0x8016 ], /* listbuffers          */
+    [ 'D',          0x8037 ], /* Dinsertdate          */
+    [ 'F',          0x8017 ], /* filename             */
+    [ 'I',          0x8038 ], /* Dinsertfile          */
+    [ 'M',          0x8018 ], /* filemodify           */
+    [ 'N',          0x803B ], /* filenext             */
+    [ 'Q',          0x803C ], /* quit                 */
+    [ 'R',          0x801C ], /* fileread             */
+    [ 'S',          0x801D ], /* filesave             */
+    [ 'T',          0x8046 ], // random_hardtab
+    [ 'U',          0x803A ], /* fileunmodify         */
+    [ 'V',          0x801F ], /* filevisit            */
+    [ 'W',          0x8020 ], /* filewrite            */
+    [ 'X',          0x803D ], /* normexit             */
+    [ F2KEY,        0x803E ], /* Dundelline           */
+    [ F4KEY,        0x803F ], /* Dsearch              */
+    [ CtrlRTKEY,    0x8040 ], /* Dundelword           */
+    [ CtrlLFKEY,    0x8040 ], /* Dundelword           */
+    [ DelKEY,       0x8041 ], /* random_undelchar     */
+    [ InsKEY,       0x8042 ], /* random_openline      */
 ];
 
 immutable ushort[2][] esc_tab =
 [
-    ['.',       0x8025], /* basic_setmark        */
-    ['>',       0x8026], /* gotoeob              */
-    [ENDKEY,    0x8026], /* gotoeob              */
-    ['<',       0x8027], /* gotobob              */
-    [HOMEKEY,   0x8027], /* gotobob              */
-    ['8',       0x8028], /* region_copy          */
-    ['9',       0x8029], /* region_kill          */
-    ['B',       0x802A], /* word_back            */
-    ['C',       0x802B], /* capword              */
-    ['D',       0x802C], /* delfword             */
-    ['E',       0x8049], // openBrowser
-    ['F',       0x802D], /* word_forw            */
-    ['H',       0x8023], /* delbword             */
-    ['I',       0x8024], /* random_opttab        */
-    ['J',       0x803E], // Dundelline
-    ['L',       0x802E], /* misc_lower           */
-    ['M',       0x8048], // help
-    ['N',       0x8019], /* window_mvdn          */
-    ['P',       0x801B], /* window_mvup          */
-    ['Q',       0x802F], /* queryreplacestring   */
-    ['R',       0x8030], /* replacestring        */
-    ['T',       0x8044], /* region_togglemode    */
-    ['U',       0x8031], /* misc_upper           */
-    ['V',       0x8032], /* backpage             */
-    ['W',       0x8033], /* word_select          */
-    ['X',       0x8021], /* swapmark             */
-    ['Z',       0x8022], /* window_shrink        */
-    [DNKEY,     0x8034], // Dadvance
-    [UPKEY,     0x8035], // Dbackup
+    [ '.',           0x8025 ], /* basic_setmark        */
+    [ '>',           0x8026 ], /* gotoeob              */
+    [ ENDKEY,        0x8026 ], /* gotoeob              */
+    [ '<',           0x8027 ], /* gotobob              */
+    [ HOMEKEY,       0x8027 ], /* gotobob              */
+    [ '8',           0x8028 ], /* region_copy          */
+    [ '9',           0x8029 ], /* region_kill          */
+    [ 'B',           0x802A ], /* word_back            */
+    [ 'C',           0x802B ], /* capword              */
+    [ 'D',           0x802C ], /* delfword             */
+    [ 'E',           0x8049 ], // openBrowser
+    [ 'F',           0x802D ], /* word_forw            */
+    [ 'H',           0x8023 ], /* delbword             */
+    [ 'I',           0x8024 ], /* random_opttab        */
+    [ 'J',           0x803E ], // Dundelline
+    [ 'L',           0x802E ], /* misc_lower           */
+    [ 'M',           0x8048 ], // help
+    [ 'N',           0x8019 ], /* window_mvdn          */
+    [ 'P',           0x801B ], /* window_mvup          */
+    [ 'Q',           0x802F ], /* queryreplacestring   */
+    [ 'R',           0x8030 ], /* replacestring        */
+    [ 'T',           0x8044 ], /* region_togglemode    */
+    [ 'U',           0x8031 ], /* misc_upper           */
+    [ 'V',           0x8032 ], /* backpage             */
+    [ 'W',           0x8033 ], /* word_select          */
+    [ 'X',           0x8021 ], /* swapmark             */
+    [ 'Z',           0x8022 ], /* window_shrink        */
+    [ DNKEY,         0x8034 ], // Dadvance
+    [ UPKEY,         0x8035 ], // Dbackup
 ];
 
 immutable ushort[2][] ctlx_tab =
 [
-    ['@',       0x8001], // spawn_pipe
-    ['#',       0x8002], // spawn_filter
-    ['=',       0x8003], // random_showcpos
-    ['(',       0x8004], // ctlxlp
-    [')',       0x8005], // ctlxrp
-    ['[',       0x8006], // random_decindent
-    [']',       0x8007], // random_incindent
-    ['.',       0x8009], // removemark
-    ['!',       0x800A], // spawn
-    ['1',       0x8008], // window_only
-    ['2',       0x800B], // window_split
-    ['A',       0x8047], // word_wrap_line
-    ['B',       0x800C], // usebuffer
-    ['D',       0x800D], // delwind
-    ['E',       0x800E], // ctlxe
-    ['F',       0x800F], // random_setfillcol
-    ['K',       0x8010], // killbuffer
-    ['L',       0x8039], // gotoline
-    ['N',       0x8011], // window_next
-    ['O',       0x801A], // random_deblank
-    ['P',       0x8012], // window_prev
-    ['Q',       0x8013], // random_quote
-    ['T',       0x801E], // window_reposition
-    ['U',       0x804A], // scrollUnicode
-    ['W',       0x8014], // buffer_next
-    ['Z',       0x8015], // window_enlarge
-    ['/',       0x8045], // Dcppcomment
+    [ '@',           0x8001 ], // spawn_pipe
+    [ '#',           0x8002 ], // spawn_filter
+    [ '=',           0x8003 ], // random_showcpos
+    [ '(',           0x8004 ], // ctlxlp
+    [ ')',           0x8005 ], // ctlxrp
+    [ '[',           0x8006 ], // random_decindent
+    [ ']',           0x8007 ], // random_incindent
+    [ '.',           0x8009 ], // removemark
+    [ '!',           0x800A ], // spawn
+    [ '1',           0x8008 ], // window_only
+    [ '2',           0x800B ], // window_split
+    [ 'A',           0x8047 ], // word_wrap_line
+    [ 'B',           0x800C ], // usebuffer
+    [ 'D',           0x800D ], // delwind
+    [ 'E',           0x800E ], // ctlxe
+    [ 'F',           0x800F ], // random_setfillcol
+    [ 'K',           0x8010 ], // killbuffer
+    [ 'L',           0x8039 ], // gotoline
+    [ 'N',           0x8011 ], // window_next
+    [ 'O',           0x801A ], // random_deblank
+    [ 'P',           0x8012 ], // window_prev
+    [ 'Q',           0x8013 ], // random_quote
+    [ 'T',           0x801E ], // window_reposition
+    [ 'U',           0x804A ], // scrollUnicode
+    [ 'W',           0x8014 ], // buffer_next
+    [ 'Z',           0x8015 ], // window_enlarge
+    [ '/',           0x8045 ], // Dcppcomment
 ];
 
 struct CMDTAB
@@ -500,38 +501,38 @@ void main(string[] args)
     gargi = 2;
     gargs = args;
     lastflag = 0;               /* Fake last flags.     */
-    while (1)
+Lgetkey:
+    update();               /* Fix up the screen    */
+    comm = getkey();
+    if (mpresf != FALSE)    /* if there is stuff in message line */
     {
-        update();               /* Fix up the screen    */
-        comm = getkey();
-        if (mpresf != FALSE)    /* if there is stuff in message line */
-        {
-            mlerase();          /* erase it                     */
-            update();
-        }
-        f = FALSE;
-        n = 1;
-        if (comm == CTRL('U'))  /* ^U, start argument   */
-        {
-            f = TRUE;
-            n = getarg();
-        }
-        if (kbdmip != null)
-        { /* Save macro strokes.  */
-            if (comm != CMD_ENDMACRO && kbdmip > &kbdm[$ - 6])
-            {
-                ctrlg(FALSE, 0);
-                continue;
-            }
-            if (f != FALSE)
-            {
-                *kbdmip++ = CTRL('U');
-                *kbdmip++ = n;
-            }
-            *kbdmip++ = comm;
-        }
-        execute(0, comm, f, n); /* Do it.               */
+        mlerase();          /* erase it                     */
+        update();
     }
+    f = FALSE;
+    n = 1;
+    if (comm == CTRL('U'))  /* ^U, start argument   */
+    {
+        f = TRUE;
+        n = getarg();
+    }
+    if (kbdmip != null)
+    { /* Save macro strokes.  */
+        if (comm != CMD_ENDMACRO && kbdmip > &kbdm[$ - 6])
+        {
+            ctrlg(FALSE, 0);
+            //continue;
+            goto Lgetkey;
+        }
+        if (f != FALSE)
+        {
+            *kbdmip++ = CTRL('U');
+            *kbdmip++ = n;
+        }
+        *kbdmip++ = comm;
+    }
+    execute(0, comm, f, n); /* Do it.               */
+    goto Lgetkey;
 }
 
 /******************************
@@ -633,7 +634,7 @@ int execute(int prefix, int c, bool f, int n)
             thisflag = 0;
             status = (*ktp.k_fp)(f, n);
             lastflag = thisflag;
-            return (status);
+            return status;
         }
     }
 
@@ -810,7 +811,7 @@ int ctlxlp(bool f, int n)
     foreach (wp; windows)
         wp.w_flag |= WFMODE; /* so highlighting is updated */
 
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -842,10 +843,7 @@ int ctlxrp(bool f, int n)
 
 int macrotoggle(bool f, int n)
 {
-    if (kbdmip)
-        return ctlxrp(f, n);
-    else
-        return ctlxlp(f, n);
+    return kbdmip ? ctlxrp(f, n) : ctlxlp(f, n);
 }
 
 /*
@@ -869,7 +867,7 @@ int ctlxe(bool f, int n)
     }
 
     if (n <= 0) /* Execute macro 0 or fewer (!) times   */
-        return (TRUE);
+        return TRUE;
 
     do
     {
@@ -913,20 +911,25 @@ version (Windows)
 {
     CONFIG config =
     { // mode, norm, eol, mark, tab, url, search
+        // Green on black
         //0x74,0x02,0x07,0x24,
+        // White on gray
         //0x34,0x7F,0x78,0x3B,
+        // Light yellow on black
         //0x34,0x0E,0x0E,0x3B,
+        // Black on gray
         //0x34,0x70,0x70,0x3B,
-        //0x34,0xF0,0xF0,0x3B,
+        // Black on gray
+        //4,0xF0,0xF0,0x3B,
+        // Default: Black on white
         0x3E, 0xF0, 0xF0, 0x3B,
-        ' ' /*0xAF*/ ,
-        0xF9, // url
-            0xE1, // search
+        ' ',    // tab
+        0xF9,   // url
+        0xE1,   // search
 
-            0xF9, //0xF3, // keyword
-            0xFC, //0xF4, // string
-            0xF8, //0xF2, // comment
-    
+        0xF9, //0xF3, // keyword
+        0xFC, //0xF4, // string
+        0xF8, //0xF2, // comment
     };
 }
 else version (Posix)
@@ -934,34 +937,32 @@ else version (Posix)
     CONFIG config =
     {
         Color.bgCyan | Color.lightYellow, // mode
-            Color.black, // norm
-            Color.black, // eol
-            Color.reverse, // mark
-            ' ', // tab
-            Color.underline | Color.blue, // url
-            Color.bgYellow | Color.black, // search
+        Color.black,        // norm
+        Color.black,        // eol
+        Color.reverse,      // mark
+        ' ',                // tab
+        Color.underline | Color.blue, // url
+        Color.bgYellow | Color.black, // search
 
-            Color.blue, // keyword
-            Color.red, // string
-            Color.magenta, // comment
-    
+        Color.blue,         // keyword
+        Color.red,          // string
+        Color.magenta,      // comment
     };
 }
 else
 {
     CONFIG config =
     {
-        Color.bright, // mode
-            0, // norm
-            0, // eol
-            Color.bright, // mark
-            ' ', // tab
-            0, // url
-            Color.yellow, // search
-            0, // keyword
-            0, // string
-            0, // comment
-    
+        Color.bright,   // mode
+        0,              // norm
+        0,              // eol
+        Color.bright,   // mark
+        ' ',            // tab
+        0,              // url
+        Color.yellow,   // search
+        0,              // keyword
+        0,              // string
+        0,              // comment
     };
 }
 

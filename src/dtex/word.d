@@ -194,12 +194,10 @@ err:
 
 int word_select(bool f, int n)
 {
-    int inw;
     int s;
 
-    inw = inword();
-    do
-        s = backchar(false, 1);
+    int inw = inword();
+    do s = backchar(false, 1);
     while (s && inword() == inw);
 
     return s &&
@@ -343,10 +341,10 @@ private int word_setcase(bool f, int n, int flag)
                 break;
             }
             if (forwchar(false, 1) == false)
-                return (false);
+                return false;
         }
     }
-    return (true);
+    return true;
 }
 
 /*
@@ -356,15 +354,11 @@ private int word_setcase(bool f, int n, int flag)
  */
 int delfword(bool f, int n)
 {
-    int size;
-    LINE* dotp;
-    int doto;
-
     if (n < 0)
         return (false);
-    dotp = curwp.w_dotp;
-    doto = curwp.w_doto;
-    size = 0;
+    LINE* dotp = curwp.w_dotp;
+    int   doto = curwp.w_doto;
+    int size;
     while (n--)
     {
         while (inword() == false)
@@ -382,7 +376,7 @@ int delfword(bool f, int n)
     }
     curwp.w_dotp = dotp;
     curwp.w_doto = doto;
-    return (line_delete(size, true));
+    return line_delete(size, true);
 }
 
 /*
@@ -392,13 +386,11 @@ int delfword(bool f, int n)
  */
 int delbword(bool f, int n)
 {
-    int size;
-
     if (n < 0)
         return false;
     if (backchar(false, 1) == false)
         return false;
-    size = 0;
+    int size;
     while (n--)
     {
         while (inword() == false)

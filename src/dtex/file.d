@@ -99,12 +99,9 @@ int Dinsertfile(bool f, int n)
     }
     catch (Exception ex)
     {
-        //TODO: Use .msg
-        mlwrite(ex.toString());
+        mlwrite(ex.msg);
         return FALSE;
     }
-    //TODO: Remove finally usage
-    //      Move return TRUE at function end
     finally
     {
         foreach (wp; windows)
@@ -164,53 +161,53 @@ int file_readin(string fname)
     foreach (bp; buffers)
     {
         /* Always redo temporary buffers, check for filename match.     */
-        //TODO: invert statement
-        if ((bp.b_flag & BFTEMP) == 0 && globMatch(bp.b_fname, fname))
+        // Was if ((bp.b_flag & BFTEMP) == 0 && globMatch(bp.b_fname, fname))
+        if ((bp.b_flag & BFTEMP) || globMatch(bp.b_fname, fname) == false)
+            continue;
+        
+        /* If the current buffer now becomes undisplayed            */
+        if (--curbp.b_nwnd == 0)
         {
-            /* If the current buffer now becomes undisplayed            */
-            if (--curbp.b_nwnd == 0)
+            curbp.b_dotp = curwp.w_dotp;
+            curbp.b_doto = curwp.w_doto;
+            curbp.b_markp = curwp.w_markp;
+            curbp.b_marko = curwp.w_marko;
+        }
+        curbp = bp;
+        curwp.w_bufp = bp;
+        if (bp.b_nwnd++ == 0) /* if buffer not already displayed */
+        {
+            curwp.w_dotp = bp.b_dotp;
+            curwp.w_doto = bp.b_doto;
+            curwp.w_markp = bp.b_markp;
+            curwp.w_marko = bp.b_marko;
+        }
+        else
+        {
+            /* Set dot to be at place where other window has it     */
+            foreach (wp; windows)
             {
-                curbp.b_dotp = curwp.w_dotp;
-                curbp.b_doto = curwp.w_doto;
-                curbp.b_markp = curwp.w_markp;
-                curbp.b_marko = curwp.w_marko;
-            }
-            curbp = bp;
-            curwp.w_bufp = bp;
-            if (bp.b_nwnd++ == 0) /* if buffer not already displayed */
-            {
-                curwp.w_dotp = bp.b_dotp;
-                curwp.w_doto = bp.b_doto;
-                curwp.w_markp = bp.b_markp;
-                curwp.w_marko = bp.b_marko;
-            }
-            else
-            {
-                /* Set dot to be at place where other window has it     */
-                foreach (wp; windows)
+                if (wp != curwp && wp.w_bufp == bp)
                 {
-                    if (wp != curwp && wp.w_bufp == bp)
-                    {
-                        curwp.w_dotp = wp.w_dotp;
-                        curwp.w_doto = wp.w_doto;
-                        curwp.w_markp = wp.w_markp;
-                        curwp.w_marko = wp.w_marko;
-                        break;
-                    }
+                    curwp.w_dotp = wp.w_dotp;
+                    curwp.w_doto = wp.w_doto;
+                    curwp.w_markp = wp.w_markp;
+                    curwp.w_marko = wp.w_marko;
+                    break;
                 }
             }
-
-            /* Adjust frame so dot is at center */
-            lp = curwp.w_dotp;
-            i = curwp.w_ntrows / 2;
-            while (i-- && lback(lp) != curbp.b_linep)
-                lp = lback(lp);
-            curwp.w_linep = lp;
-
-            curwp.w_flag |= WFMODE | WFHARD;
-            mlwrite("[Old buffer]");
-            return TRUE;
         }
+
+        /* Adjust frame so dot is at center */
+        lp = curwp.w_dotp;
+        i = curwp.w_ntrows / 2;
+        while (i-- && lback(lp) != curbp.b_linep)
+            lp = lback(lp);
+        curwp.w_linep = lp;
+
+        curwp.w_flag |= WFMODE | WFHARD;
+        mlwrite("[Old buffer]");
+        return TRUE;
     }
 
     bname = makename(fname); /* New buffer name.     */
@@ -263,7 +260,6 @@ int readin(string dfname)
 
     /* Determine if file is read-only   */
     string fname = std.path.expandTilde(toUTF8(dfname));
-    //TODO: Turn into ternary
     if (ffreadonly(fname)) /* is file read-only?   */
         bp.b_flag |= BFRDONLY;
     else
@@ -302,7 +298,8 @@ int readin(string dfname)
             lp1.l_fp = curbp.b_linep;
             lp1.l_bp = lp2;
             curbp.b_linep.l_bp = lp1;
-            if (first && line.length >= 3 && line[0] == 0xEF && line[1] == 0xBB && line[2] == 0xBF)
+            if (first && line.length >= 3 &&
+                line[0] == 0xEF && line[1] == 0xBB && line[2] == 0xBF)
                 line = line[3 .. $]; // skip BOM
             lp1.l_text = line[].dup;
 
@@ -318,12 +315,9 @@ int readin(string dfname)
     }
     catch (Exception ex)
     {
-        //TODO: Use ex.msg
-        mlwrite(ex.toString());
+        mlwrite(ex.msg);
         return FALSE;
     }
-    //TODO: Remove finally usage
-    //      Move return TRUE at function end
     finally
     {
         foreach (wp; windows)
@@ -377,13 +371,10 @@ int filewrite(bool f, int n)
             return FALSE;
         return file_writeregion(fname, &region);
     }
-    else
+    else if ((s = writeout(fname)) == TRUE)
     {
-        if ((s = writeout(fname)) == TRUE)
-        {
-            curbp.setFilename(fname);
-            fileunmodify(f, n);
-        }
+        curbp.setFilename(fname);
+        fileunmodify(f, n);
     }
     return (s);
 }
@@ -415,7 +406,6 @@ int fileunmodify(bool f, int n)
  */
 int filesave(bool f, int n)
 {
-    WINDOW* wp;
     int s;
 
     if ((curbp.b_flag & BFCHG) == 0) /* Return, no changes.  */
@@ -518,8 +508,7 @@ int writeout(string dfn)
     }
     catch (Exception ex)
     {
-        //TODO: Use ex.msg
-        mlwrite(ex.toString());
+        mlwrite(ex.msg);
         return FALSE;
     }
 }
@@ -584,8 +573,7 @@ int file_writeregion(string dfilename, REGION* region)
     }
     catch (Exception ex)
     {
-        //TODO: Use ex.msg
-        mlwrite(ex.toString());
+        mlwrite(ex.msg);
         return FALSE;
     }
 }

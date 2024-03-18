@@ -73,17 +73,15 @@ struct BUFFER
 
 enum
 {
-    BFTEMP = 0x01,   // Internal temporary buffer
-    BFCHG = 0x02,    // Changed since last write
-    BFRDONLY = 0x04, // Buffer is read only
-    BFNOCR = 0x08,   // last line in buffer has no
-    // trailing CR
+    BFTEMP      = 0x01, /// Internal temporary buffer
+    BFCHG       = 0x02, /// Changed since last write
+    BFRDONLY    = 0x04, /// Buffer is read only
+    BFNOCR      = 0x08, /// last line in buffer has no trailing CR
 }
 
 enum Language
 {
-    // NOTE: Enum start at 0
-    text, // plain text (must be 0)
+    text, // Plain text
     D,    // D programming language
     C,    // C programming language
     CPP,  // C++ programming language
@@ -103,10 +101,10 @@ int usebuffer(bool f, int n)
 
     int s = mlreply("Use buffer: ", null, bufn);
     if (s != TRUE)
-        return (s);
+        return s;
     BUFFER* bp = buffer_find(bufn, TRUE, 0);
     if (bp == null)
-        return (FALSE);
+        return FALSE;
     return buffer_switch(bp);
 }
 
@@ -227,7 +225,7 @@ int buffer_remove(BUFFER* bp)
     //delete bp;                      /* Release buffer block */
     core.memory.GC.free(bp);
 
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -247,6 +245,7 @@ int listbuffers(bool f, int n)
 
     if ((s = makelist()) != TRUE)
         return (s);
+
     if (blistp.b_nwnd == 0)
     { /* Not on screen yet.   */
         WINDOW* wp;
@@ -263,6 +262,7 @@ int listbuffers(bool f, int n)
         wp.w_bufp = blistp;
         ++blistp.b_nwnd;
     }
+
     foreach (wp; windows)
     {
         if (wp.w_bufp == blistp)
@@ -275,7 +275,8 @@ int listbuffers(bool f, int n)
             wp.w_flag |= WFMODE | WFHARD;
         }
     }
-    return (TRUE);
+
+    return TRUE;
 }
 
 /*
@@ -291,11 +292,10 @@ int makelist()
     LINE* lp;
     int nbytes;
     int s;
-    int type;
     char[6 + 1] b;
     char[128] line;
 
-    blistp.b_flag &= ~BFCHG; /* Don't complain!      */
+    blistp.b_flag &= ~BFCHG;                /* Don't complain!      */
     if ((s = buffer_clear(blistp)) != TRUE) /* Blow old text away   */
         return (s);
     blistp.b_fname = null;
@@ -309,8 +309,8 @@ int makelist()
         { /* Skip magic ones.     */
             continue;
         }
-        int i = 0; /* Start at left edge   */
-        if ((bp.b_flag & BFCHG) != 0) /* "*" if changed       */
+        int i;                              /* Start at left edge   */
+        if ((bp.b_flag & BFCHG) != 0)       /* "*" if changed       */
             line[i++] = '*';
         else
             line[i++] = ' ';
@@ -322,10 +322,10 @@ int makelist()
             nbytes += llength(lp) + 1;
             lp = lforw(lp);
         }
-        buffer_itoa(b, 6, nbytes); /* 6 digit buffer size. */
+        buffer_itoa(b, 6, nbytes);          /* 6 digit buffer size. */
         line[i .. i + b.length] = b;
         i += b.length;
-        line[i++] = ' '; /* Gap.                 */
+        line[i++] = ' ';                    /* Gap.                 */
         line[i .. i + bp.b_bname.length] = bp.b_bname; // buffer name
         i += bp.b_bname.length;
         if (bp.b_fname.length)
@@ -341,21 +341,21 @@ int makelist()
         }
         /* Add to the buffer.   */
         if (addline(line[0 .. i].idup) == FALSE)
-            return (FALSE);
+            return FALSE;
     }
-    return (TRUE); /* All done             */
+    return TRUE; /* All done             */
 }
 
 void buffer_itoa(char[] buf, int width, int num)
 {
-    buf[width] = 0; /* End of string.       */
+    buf[width] = 0;                     /* End of string.       */
     while (num >= 10)
     { /* Conditional digits.  */
         buf[--width] = cast(char)((num % 10) + '0');
         num /= 10;
     }
     buf[--width] = cast(char)(num + '0'); // Always 1 digit.
-    while (width != 0) /* Pad with blanks.     */
+    while (width != 0)                  /* Pad with blanks.     */
         buf[--width] = ' ';
 }
 
@@ -461,16 +461,16 @@ int buffer_clear(BUFFER* bp)
 
     /*if (bp.b_flag & BFRDONLY)
             return FALSE;*/
-    if ((bp.b_flag & BFTEMP) == 0 /* Not scratch buffer.  */
-        && (bp.b_flag & BFCHG) != 0 /* Something changed    */
+    if ((bp.b_flag & BFTEMP) == 0           /* Not scratch buffer.  */
+        && (bp.b_flag & BFCHG) != 0         /* Something changed    */
         && (s = mlyesno("Discard changes [y/n]? ")) != TRUE)
-        return (s);
-    bp.b_flag &= ~BFCHG; /* Not changed          */
+        return s;
+    bp.b_flag &= ~BFCHG;                    /* Not changed          */
     while ((lp = lforw(bp.b_linep)) != bp.b_linep)
         line_free(lp);
-    bp.b_dotp = bp.b_linep; /* Fix "."              */
+    bp.b_dotp = bp.b_linep;                 /* Fix "."              */
     bp.b_doto = 0;
-    bp.b_markp = null; /* Invalidate "mark"    */
+    bp.b_markp = null;                      /* Invalidate "mark"    */
     bp.b_marko = 0;
-    return (TRUE);
+    return TRUE;
 }

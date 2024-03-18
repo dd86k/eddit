@@ -101,10 +101,11 @@ enum
     GOLD = GOLDKEY,     /* Another Meta flag, or'ed in  */
 }
 
+//TODO: Rename to avoid clashes with Windows headers
 enum
 {
     FALSE = 0,  /* False, no, bad, etc.         */
-    TRUE = 1,   /* True, yes, good, etc.        */
+    TRUE  = 1,  /* True, yes, good, etc.        */
     ABORT = 2,  /* Death, ^G, abort, etc.       */
 }
 
@@ -169,39 +170,39 @@ struct CONFIG
 enum Color : attr_t
 {
     // text colors
-    black = 0,
-    red = 1,
-    green = 2,
-    yellow = red | green,
-    blue = 4,
-    magenta = red | blue, // purple
-    cyan = green | blue,
-    lightGray = red | green | blue,
+    black       = 0,
+    red         = 1,
+    green       = 2,
+    yellow      = red | green,
+    blue        = 4,
+    magenta     = red | blue, // purple
+    cyan        = green | blue,
+    lightGray   = red | green | blue,
 
-    darkGray = bold | black,
-    lightRed = bold | red,
-    lightGreen = bold | green,
-    lightBlue = bold | blue,
-    lightYellow = bold | yellow,
-    lightMagenta = bold | magenta,
-    lightCyan = bold | cyan,
-    white = bold | lightGray,
+    darkGray        = bold | black,
+    lightRed        = bold | red,
+    lightGreen      = bold | green,
+    lightBlue       = bold | blue,
+    lightYellow     = bold | yellow,
+    lightMagenta    = bold | magenta,
+    lightCyan       = bold | cyan,
+    white           = bold | lightGray,
 
     // background text colors
-    bgBlack = black << 4,
-    bgRed = red << 4,
-    bgGreen = green << 4,
-    bgYellow = yellow << 4,
-    bgBlue = blue << 4,
-    bgMagenta = magenta << 4,
-    bgCyan = cyan << 4,
-    bgGray = lightGray << 4,
+    bgBlack     = black << 4,
+    bgRed       = red << 4,
+    bgGreen     = green << 4,
+    bgYellow    = yellow << 4,
+    bgBlue      = blue << 4,
+    bgMagenta   = magenta << 4,
+    bgCyan      = cyan << 4,
+    bgGray      = lightGray << 4,
 
-    bgMask = 0x70,
+    bgMask      = 0x70,
 
-    bold = 8, // bold only modifies text color by lightening it
-    underline = 0x80,
-    reverse = white,
+    bold        = 8,    // bold only modifies text color by lightening it
+    underline   = 0x80,
+    reverse     = white,
 }
 
 /**************

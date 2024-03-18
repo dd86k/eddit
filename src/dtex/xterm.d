@@ -61,7 +61,7 @@ __gshared msm_status mstat;
 
 int msm_getstatus(uint* pcol, uint* prow)
 {
-    int c = 0;
+    int c;
     switch (mstat.state)
     {
     case 0:
@@ -76,31 +76,20 @@ int msm_getstatus(uint* pcol, uint* prow)
         return 1;
 
     case 2:
-        //TODO: Inverse comparisons
-        c = ttgetc();
-        if (c == 0x1b)
-        {
-            c = ttgetc();
-            if (c == '[')
-            {
-                c = ttgetc();
-                if (c == 'M')
-                {
-                    c = ttgetc();
-                    if (c == '#') // left and right mouse up event
-                    {
-                        c = ttgetc();
-                        if (c >= 0x21)
-                        {
-                            mstat.col = c - 0x21;
-                            c = ttgetc();
-                            if (c >= 0x21)
-                                mstat.row = c - 0x21;
-                        }
-                    }
-                }
-            }
-        }
+        if ((c = ttgetc()) != ESC)
+            goto Ld;
+        if ((c = ttgetc()) != '[')
+            goto Ld;
+        if ((c = ttgetc()) != 'M')
+            goto Ld;
+        if ((c = ttgetc()) != '#') // left and right mouse up event
+            goto Ld;
+        if ((c = ttgetc()) <  '!')
+            goto Ld;
+        mstat.col = c - '!';
+        if ((c = ttgetc()) >= '!')
+            mstat.row = c - '!';
+    Ld:
         *prow = mstat.row;
         *pcol = mstat.col;
         mstat.state = 3;

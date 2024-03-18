@@ -70,23 +70,18 @@ int Dcur_direction = ADVANCE;
 
 int Dsearch(bool f, int n)
 {
-    if (Dcur_direction == ADVANCE)
-        return (forwsearch(f, n));
-    else
-        return (backsearch(f, n));
+    return Dcur_direction == ADVANCE ?
+            forwsearch(f, n) :
+            backsearch(f, n);
 }
 
 int Dsearchagain(bool f, int n)
 {
-    int s;
     Dnoask_search = true;
-    //TODO: Can be put at end of function normally
-    scope (exit)
-        Dnoask_search = false;
-    if (Dcur_direction == ADVANCE)
-        s = forwsearch(f, n);
-    else
-        s = backsearch(f, n);
+    int s = Dcur_direction == ADVANCE ?
+            forwsearch(f, n) :
+            backsearch(f, n);
+    Dnoask_search = false;
     return s;
 }
 
@@ -209,10 +204,9 @@ int Dpause(bool f, int n)
 
 int misc_upper(bool f, int n)
 {
-    if (curwp.w_markp)
-        return region_upper(f, n);
-    else
-        return word_upper(f, n);
+    return curwp.w_markp ?
+        region_upper(f, n) :
+        word_upper(f, n);
 }
 
 /*********************************
@@ -221,10 +215,9 @@ int misc_upper(bool f, int n)
 
 int misc_lower(bool f, int n)
 {
-    if (curwp.w_markp)
-        return region_lower(f, n);
-    else
-        return word_lower(f, n);
+    return curwp.w_markp ?
+        region_lower(f, n) :
+        word_lower(f, n);
 }
 
 /*********************************
@@ -242,19 +235,15 @@ int Dinsertdate(bool f, int n)
 
 void deblank()
 {
-    int len;
-    int n;
-    int c;
     int i;
-
-    len = llength(curwp.w_dotp);
+    int len = llength(curwp.w_dotp);
     for (i = len - 1; i >= 0; i--)
     {
-        c = lgetc(curwp.w_dotp, i);
+        int c = lgetc(curwp.w_dotp, i);
         if (!isSpace(c))
             break;
     }
-    n = (len - 1) - i;
+    int n = (len - 1) - i;
     if (n)
     {
         curwp.w_doto = i + 1;

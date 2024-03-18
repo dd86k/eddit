@@ -45,20 +45,14 @@ int random_setfillcol(bool f, int n)
  */
 int random_showcpos(bool f, int n)
 {
-    LINE* clp;
-    int numchars;
-    int cbo;
     int thischar;
     int charatdot;
-    int ratio;
-    int col;
     int thisline;
-    int numlines;
 
-    clp = lforw(curbp.b_linep); /* Grovel the data.     */
-    cbo = 0;
-    numchars = 0;
-    numlines = 1;
+    LINE* clp = lforw(curbp.b_linep); /* Grovel the data.     */
+    int cbo = 0;
+    int numchars = 0;
+    int numlines = 1;
     for (;;)
     {
         /* if on the current dot, save the character at dot     */
@@ -84,8 +78,8 @@ int random_showcpos(bool f, int n)
             ++cbo;
         ++numchars;
     }
-    col = getcol(curwp.w_dotp, curwp.w_doto); /* Get real column     */
-    ratio = 0; /* Ratio before dot.    */
+    int col = getcol(curwp.w_dotp, curwp.w_doto); /* Get real column     */
+    int ratio = 0; /* Ratio before dot.    */
     if (numchars != 0)
         ratio = cast(int)((100 * thischar) / numchars);
     mlwrite("row=%d col=%d CH=0x%x .=%d (%d%% of %d) line %d of %d",
@@ -103,19 +97,14 @@ int random_showcpos(bool f, int n)
  */
 int random_twiddle(bool f, int n)
 {
-    LINE* dotp;
-    int doto;
-    char cl;
-    char cr;
-
-    dotp = curwp.w_dotp;
-    doto = curwp.w_doto;
+    LINE* dotp = curwp.w_dotp;
+    int doto = curwp.w_doto;
     if (doto == llength(dotp) && --doto < 0)
         return (FALSE);
-    cr = lgetc(dotp, doto);
+    char cr = lgetc(dotp, doto);
     if (--doto < 0)
         return (FALSE);
-    cl = lgetc(dotp, doto);
+    char cl = lgetc(dotp, doto);
     lputc(dotp, doto + 0, cr);
     lputc(dotp, doto + 1, cl);
     line_change(WFEDIT);
@@ -131,16 +120,14 @@ int random_twiddle(bool f, int n)
  */
 int random_quote(bool f, int n)
 {
-    int s;
-    int c;
-
-    c = term.t_getchar();
+    int c = term.t_getchar();
     if (c & ~0xFF || n < 0)
         return (FALSE);
     if (n == 0)
         return (TRUE);
     if (c == '\n')
     {
+        int s;
         do { s = line_newline(); }
         while (s == TRUE && --n);
         return (s);
@@ -158,11 +145,11 @@ int random_quote(bool f, int n)
 int random_tab(bool f, int n)
 {
     if (n < 0)
-        return (FALSE);
+        return FALSE;
     if (n == 0 || n > 1)
     {
         tabsize = n;
-        return (TRUE);
+        return TRUE;
     }
     if (!tabsize)
         return (line_insert(1, '\t'));
@@ -175,7 +162,7 @@ int random_tab(bool f, int n)
 int random_hardtab(bool f, int n)
 {
     if (n < 0)
-        return (FALSE);
+        return FALSE;
     if (n == 0 || n > 1)
         hardtabsize = n;
     else if (hardtabsize == 8)
@@ -193,14 +180,13 @@ int random_hardtab(bool f, int n)
  */
 int random_openline(bool f, int n)
 {
-    int i;
     int s;
 
     if (n < 0)
         return (FALSE);
     if (n == 0)
         return (TRUE);
-    i = n; /* Insert newlines.     */
+    int i = n; /* Insert newlines.     */
     do
     {
         s = line_newline();
@@ -208,7 +194,7 @@ int random_openline(bool f, int n)
     while (s == TRUE && --i);
     if (s == TRUE) /* Then back up overtop */
         s = backchar(f, n); /* of them all.         */
-    return (s);
+    return s;
 }
 
 /*
@@ -220,8 +206,6 @@ int random_openline(bool f, int n)
  */
 int random_newline(bool f, int n)
 {
-    int nicol;
-    LINE* lp;
     int s;
 
     if (n < 0)
@@ -244,15 +228,13 @@ int random_newline(bool f, int n)
  */
 int random_deblank(bool f, int n)
 {
-    LINE* lp1;
     LINE* lp2;
-    int nld;
 
-    lp1 = curwp.w_dotp;
+    LINE* lp1 = curwp.w_dotp;
     while (llength(lp1) == 0 && (lp2 = lback(lp1)) != curbp.b_linep)
         lp1 = lp2;
     lp2 = lp1;
-    nld = 0;
+    int nld = 0;
     while ((lp2 = lforw(lp2)) != curbp.b_linep && llength(lp2) == 0)
         ++nld;
     if (nld == 0)
@@ -377,8 +359,8 @@ private int changeindent(bool f, int n, int val)
             nicol += val;
             if (nicol < 0)
                 nicol = 0;
-            if (((i = nicol / 8) != 0 && line_insert(i, '\t') == FALSE)
-                || ((i = nicol % 8) != 0 && line_insert(i, ' ') == FALSE))
+            if (((i = nicol / 8) != 0 && line_insert(i, '\t') == FALSE) ||
+                ((i = nicol % 8) != 0 && line_insert(i, ' ')  == FALSE))
                 goto err;
         }
         if (forwline(FALSE, 1) == FALSE)
@@ -529,7 +511,7 @@ int random_forwdel(bool f, int n)
     else
         undelch = lgetc(curwp.w_dotp, curwp.w_doto);
 
-    return (line_delete(n, f));
+    return line_delete(n, f);
 }
 
 int random_undelchar(bool f, int n)
@@ -563,7 +545,7 @@ int random_backdel(bool f, int n)
     }
     if ((s = backchar(f, n)) == TRUE)
         s = line_delete(n, f);
-    return (s);
+    return s;
 }
 
 /*
@@ -612,7 +594,7 @@ int random_kill(bool f, int n)
         mlwrite("neg kill");
         return (FALSE);
     }
-    return (line_delete(chunk, TRUE));
+    return line_delete(chunk, TRUE);
 }
 
 /*
@@ -627,7 +609,8 @@ int random_yank(bool f, int n)
 {
     int c;
     int i;
-    extern int kused;
+    // Unused variable, but no idea where else it was used
+    //extern int kused;
 
     if (n < 0)
         goto err;
@@ -668,11 +651,8 @@ int random_yank(bool f, int n)
                                 goto err;
                     }
                 }
-                else
-                {
-                    if (line_insert(1, cast(char) c) == FALSE)
-                        goto err;
-                }
+                else if (line_insert(1, cast(char) c) == FALSE)
+                    goto err;
                 ++i;
             }
         }
@@ -687,11 +667,8 @@ int random_yank(bool f, int n)
                     if (random_newline(FALSE, 1) == FALSE)
                         goto err;
                 }
-                else
-                {
-                    if (line_insert(1, cast(char) c) == FALSE)
-                        goto err;
-                }
+                else if (line_insert(1, cast(char) c) == FALSE)
+                    goto err;
                 ++i;
             }
     }

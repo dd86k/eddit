@@ -122,14 +122,11 @@ static void mouse_tocursor(uint* px, uint* py)
 
 static void mouse_findpos(uint col, uint row, WINDOW** p_wp, LINE** p_lp, int* p_doto)
 {
-    int r;
-    int i;
     LINE* lp;
-
     *p_wp = null;
     *p_lp = null;
     *p_doto = 0;    /* default cases                */
-    r = 0;          /* starting row for window      */
+    int r;          /* starting row for window      */
     foreach (wp; windows)
     {
         if (row <= r + wp.w_ntrows)

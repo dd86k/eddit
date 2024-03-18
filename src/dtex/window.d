@@ -160,10 +160,7 @@ int window_mvdn(bool f, int n)
  */
 int window_mvup(bool f, int n)
 {
-    LINE* lp;
-    int i;
-
-    lp = curwp.w_linep;
+    LINE* lp = curwp.w_linep;
 
     if (n < 0)
     {
@@ -176,10 +173,11 @@ int window_mvup(bool f, int n)
             lp = lback(lp);
     }
 
-    curwp.w_linep = lp; /* new top line of window       */
-    curwp.w_flag |= WFHARD; /* Mode line is OK. */
+    curwp.w_linep = lp;         /* new top line of window       */
+    curwp.w_flag |= WFHARD;     /* Mode line is OK. */
 
-    for (i = 0; i < curwp.w_ntrows; ++i)
+    int i;
+    for (; i < curwp.w_ntrows; ++i)
     {
         if (lp == curwp.w_dotp)
             return (TRUE);
@@ -196,7 +194,7 @@ int window_mvup(bool f, int n)
 
     curwp.w_dotp = lp;
     curwp.w_doto = 0;
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -249,13 +247,6 @@ int window_only(bool f, int n)
  */
 int window_split(bool f, int n)
 {
-    LINE* lp;
-    int ntru;
-    int ntrl;
-    int ntrd;
-    WINDOW* wp1;
-    WINDOW* wp2;
-
     if (curwp.w_ntrows < 3)
     {
         mlwrite("Cannot split a %d line window", curwp.w_ntrows);
@@ -263,16 +254,16 @@ int window_split(bool f, int n)
     }
 
     WINDOW* wp = new WINDOW;
-    ++curbp.b_nwnd; /* Displayed twice.     */
+    ++curbp.b_nwnd;                             /* Displayed twice.     */
     wp.w_bufp = curbp;
     wp.w_dotp = curwp.w_dotp;
     wp.w_doto = curwp.w_doto;
     wp.w_markp = curwp.w_markp;
     wp.w_marko = curwp.w_marko;
-    ntru = (curwp.w_ntrows - 1) / 2; /* Upper size           */
-    ntrl = (curwp.w_ntrows - 1) - ntru; /* Lower size           */
-    lp = curwp.w_linep;
-    ntrd = 0;
+    int ntru = (curwp.w_ntrows - 1) / 2;        /* Upper size           */
+    int ntrl = (curwp.w_ntrows - 1) - ntru;     /* Lower size           */
+    LINE* lp = curwp.w_linep;
+    int ntrd = 0;
     while (lp != curwp.w_dotp)
     {
         ++ntrd;
@@ -320,7 +311,7 @@ int window_split(bool f, int n)
     wp.w_linep = lp; /* if necessary.        */
     curwp.w_flag |= WFMODE | WFHARD;
     wp.w_flag |= WFMODE | WFHARD;
-    return (TRUE);
+    return TRUE;
 }
 
 /*

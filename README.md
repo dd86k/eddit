@@ -6,27 +6,36 @@ with my [Win64 patches](https://github.com/dd86k/med64).
 Why? To have a small, quick editor working natively on Windows and Linux.
 
 This fork will respect the wish to keep the code on the public domain, while
-modernizing the code and turning the editor more GNU nano-like.
+modernizing the code (to D2) and turning the editor more to my liking.
 
 Changes:
 - [x] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
 - [x] Correct (the more obvious) warnings emitted by dscanner.
-- [ ] Document architecture, functions, enums.
 - [x] Format source to DStyle.
+- [ ] Change to a dark theme by default. (Windows)
 - [ ] Remove usage of `auto`. Promote usage of `alias`.
+- [ ] Reduce GC and TLS usage.
+- [ ] Add support for a trace log.
+- [ ] Document architecture, functions, enums.
 - [ ] Add `--version`.
 - [ ] Add `--help`.
-- [ ] Force dark theme regardless of platform.
 - [ ] Change statusbar to nano's minibar.
 - [ ] Turn TERM structure functions into standalone functions.
-- [ ] Reduce GC and TLS usage.
 - [ ] Stop importing main.
-- [ ] 
+- [ ] Fix usage with Right Alt (e.g., using French Canadian keyboard layout).
+- [ ] Fix HOME/END on Linux printing H/F.
+- [ ] Make CTRL+H (^H) open help in the editor as read-only.
 - [ ] Optional: Make keybinds configurable.
 - [ ] Optional: Add support for duplicating lines.
 - [ ] Optional: Make theme presets.
 - [ ] Optional: Add support for line column.
 - [ ] Optional: Convert to BetterC.
+
+Notes:
+- Windows Terminal: Yet untested.
+- conhost: Works.
+  - Needs RightAlt usage fixed.
+- Any terminal emulators: Should work in most cases.
 
 ## Default Keybinds
 

@@ -281,7 +281,7 @@ int line_insert(int n, char c)
         }
     }
 
-    return (TRUE);
+    return TRUE;
 }
 
 /***************************
@@ -352,7 +352,7 @@ int line_newline()
         }
     }
     line_change(WFHARD);
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -364,8 +364,8 @@ int line_newline()
 bool line_delete(int n, bool kflag)
 {
     LINE* dotp;
-    int doto;
-    int chunk;
+    int   doto;
+    int   chunk;
 
     if (curbp.b_flag & BFRDONLY) /* if buffer is read-only */
         return FALSE; /* error                */
@@ -477,7 +477,7 @@ bool line_delnewline()
     core.memory.GC.free(lp2.l_text.ptr);
     core.memory.GC.free(lp2);
 
-    return (TRUE);
+    return TRUE;
 }
 
 /********************** KILL BUFFER STUFF *********************/

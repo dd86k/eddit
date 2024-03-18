@@ -57,7 +57,7 @@ int spawncli(bool f, int n)
     {
         term.t_flush();
         term.t_close(); /* stty to old settings */
-        auto cp = core.stdc.stdlib.getenv("SHELL");
+        char* cp = core.stdc.stdlib.getenv("SHELL");
         if (cp && *cp != '\0')
             core.stdc.stdlib.system(cp);
         else
@@ -81,31 +81,31 @@ int spawn(bool f, int n)
     version (Windows)
     {
         if ((s = mlreply("MS-DOS command: ", null, line)) != TRUE)
-            return (s);
+            return s;
         core.stdc.stdlib.system(toUTF8(line).toStringz());
         while (term.t_getchar() != '\r') /* Pause.               */
         {
         }
         sgarbf = TRUE;
-        return (TRUE);
+        return TRUE;
     }
     else version (Posix)
     {
         if ((s = mlreply("! ", null, line)) != TRUE)
             return (s);
-        term.t_putchar('\n'); /* Already have '\r'    */
+        term.t_putchar('\n');       /* Already have '\r'    */
         term.t_flush();
-        term.t_close(); /* stty to old modes    */
+        term.t_close();             /* stty to old modes    */
         core.stdc.stdlib.system(toUTF8(line).toStringz());
         sleep(2);
         term.t_open();
-        printf("[End]"); /* Pause.               */
+        printf("[End]");            /* Pause.               */
         term.t_flush();
         while ((s = term.t_getchar()) != '\r' && s != ' ')
         {
         }
         sgarbf = TRUE;
-        return (TRUE);
+        return TRUE;
     }
 }
 
@@ -116,7 +116,6 @@ int spawn(bool f, int n)
 int spawn_pipe(bool f, int n)
 {
     int s;          /* return status from CLI */
-    WINDOW* wp;     /* pointer to new window */
     BUFFER* bp;     /* pointer to buffer to zot */
     static string bname = "[DOS]";
 
@@ -224,9 +223,9 @@ int spawn_filter(bool f, int n)
     }
     else version (Posix)
     {
-        term.t_putchar('\n'); /* Already have '\r'    */
+        term.t_putchar('\n');   /* Already have '\r'    */
         term.t_flush();
-        term.t_close(); /* stty to old modes    */
+        term.t_close();         /* stty to old modes    */
         core.stdc.stdlib.system(toUTF8(line).toStringz());
         term.t_open();
         term.t_flush();
@@ -244,8 +243,8 @@ int spawn_filter(bool f, int n)
     }
 
     /* reset file name */
-    bp.b_fname = tmpnam; /* restore name */
-    bp.b_flag |= BFCHG; /* flag it as changed */
+    bp.b_fname = tmpnam;    /* restore name */
+    bp.b_flag |= BFCHG;     /* flag it as changed */
     s = TRUE;
 
 ret:

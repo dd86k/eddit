@@ -31,12 +31,12 @@ import buffer;
  */
 struct REGION
 {
-    LINE* r_linep; /* Origin LINE address                  */
-    uint r_offset; /* Origin LINE offset (not in col mode) */
-    uint r_size; /* Length in characters (approx in col mode) */
-    uint r_nlines; /* Number of lines                      */
-    uint r_leftcol; /* Left column for column cut           */
-    uint r_rightcol; /* And right column                     */
+    LINE* r_linep;      /* Origin LINE address                  */
+    uint r_offset;      /* Origin LINE offset (not in col mode) */
+    uint r_size;        /* Length in characters (approx in col mode) */
+    uint r_nlines;      /* Number of lines                      */
+    uint r_leftcol;     /* Left column for column cut           */
+    uint r_rightcol;    /* And right column                     */
 }
 
 /*********************************
@@ -66,10 +66,10 @@ int region_kill(bool f, int n)
     if ((s = getregion(&region)) != TRUE)
         goto err;
     if (region.r_size == 0)
-        goto err; /* error if 0 length    */
-    if ((lastflag & CFKILL) == 0) /* This is a kill type  */
-        kill_freebuffer(); /* command, so do magic */
-    thisflag |= CFKILL; /* kill buffer stuff.   */
+        goto err;                   /* error if 0 length    */
+    if ((lastflag & CFKILL) == 0)   /* This is a kill type  */
+        kill_freebuffer();          /* command, so do magic */
+    thisflag |= CFKILL;             /* kill buffer stuff.   */
     curwp.w_dotp = region.r_linep;
     curwp.w_doto = region.r_offset;
     curwp.w_markp = null;
@@ -110,8 +110,6 @@ err:
  */
 int region_copy(bool f, int n)
 {
-    LINE* linep;
-    int loffs;
     int s;
     REGION region;
 
@@ -125,8 +123,8 @@ int region_copy(bool f, int n)
     curwp.w_flag |= WFHARD;
 
     thisflag |= CFKILL;
-    linep = region.r_linep; /* Current line.        */
-    loffs = region.r_offset; /* Current offset.      */
+    LINE* linep = region.r_linep;  /* Current line.        */
+    int   loffs = region.r_offset; /* Current offset.      */
     if (!kill_setsize(region.r_size))
         return FALSE;
     if (column_mode)
@@ -195,17 +193,16 @@ int region_upper(bool f, int n)
 
 private int region_case(bool flag)
 {
-    LINE* linep;
     int loffs;
     int c;
     int s;
     REGION region;
 
     if ((s = getregion(&region)) != TRUE)
-        return (s);
+        return s;
     line_change(WFHARD);
     /*curwp.w_markp = null;*/
-    linep = region.r_linep;
+    LINE* linep = region.r_linep;
     if (column_mode)
     {
         while (region.r_nlines--)
@@ -242,7 +239,7 @@ private int region_case(bool flag)
             }
         }
     }
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -258,13 +255,6 @@ private int region_case(bool flag)
  */
 int getregion(REGION* rp)
 {
-    LINE* flp;
-    LINE* blp;
-    int nlines; /* number of lines in region    */
-    int fsize;
-    int bsize;
-    int size;
-
     if (!window_marking(curwp))
     {
         mlwrite("No mark set in this window");
@@ -307,13 +297,14 @@ int getregion(REGION* rp)
                 rp.r_size = curwp.w_doto - curwp.w_marko;
             }
         }
-        return (TRUE);
+        return TRUE;
     }
 
-    blp = curwp.w_dotp;
-    bsize = curwp.w_doto;
-    flp = curwp.w_dotp;
-    fsize = llength(flp) - curwp.w_doto + 1;
+    int size;   // New size
+    LINE* blp = curwp.w_dotp;
+    int   bsize = curwp.w_doto;
+    LINE* flp = curwp.w_dotp;
+    int   fsize = llength(flp) - curwp.w_doto + 1;
     while (flp != curbp.b_linep || lback(blp) != curbp.b_linep)
     {
         rp.r_nlines++;

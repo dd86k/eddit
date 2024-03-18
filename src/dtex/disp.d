@@ -221,15 +221,15 @@ void disp_setmode(ubyte mode)
 
 enum
 {
-    DISP_REVERSEVIDEO = 0x70,
-    DISP_NORMAL = 0x07,
-    DISP_UNDERLINE = 0x01,
-    DISP_NONDISPLAY = 0x00,
+    DISP_REVERSEVIDEO   = 0x70,
+    DISP_NORMAL         = 0x07,
+    DISP_UNDERLINE      = 0x01,
+    DISP_NONDISPLAY     = 0x00,
 
-    DISP_INTENSITY = 0x08,
-    DISP_BLINK = 0x80,
+    DISP_INTENSITY      = 0x08,
+    DISP_BLINK          = 0x80,
 
-    DISP_CURSORBLOCK = 100,
-    DISP_CURSORHALF = 50,
-    DISP_CURSORUL = 20,
+    DISP_CURSORBLOCK    = 100,
+    DISP_CURSORHALF     = 50,
+    DISP_CURSORUL       = 20,
 }

@@ -50,7 +50,7 @@ dchar decodeUTF8(const(char)[] s, ref size_t index)
     }
 
     // Pick off (7 - n) significant bits of first byte of octet
-    auto V = cast(dchar)(c & ((1 << (7 - n)) - 1));
+    dchar V = cast(dchar)(c & ((1 << (7 - n)) - 1));
 
     if (i + (n - 1) >= s.length)
         goto Lerr; // off end of string
@@ -107,13 +107,12 @@ dchar decodeUTF8back(const(char)[] s, ref size_t index)
         return c;
     }
 
-    uint n;
     for (size_t j = i; 1;)
     {
         if (j == 1 || i - j == 4)
             goto Lerr;
         --j;
-        auto u = s[j];
+        char u = s[j];
         if (u <= 0x7F)
             goto Lerr;
         if ((u & 0xC0) == 0xC0)

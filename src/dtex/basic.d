@@ -75,7 +75,7 @@ int backchar(bool f, int n)
         else
             curwp.w_doto--;
     }
-    return (TRUE);
+    return TRUE;
 }
 
 /**************************************
@@ -85,9 +85,7 @@ int backchar(bool f, int n)
 
 int gotoeol(bool f, int n)
 {
-    int s;
-
-    s = TRUE;
+    int s = TRUE;
     if (curwp.w_doto != llength(curwp.w_dotp))
     {
         if (curwp.w_markp)
@@ -97,7 +95,7 @@ int gotoeol(bool f, int n)
     if (n > 0)
         s = forwline(f, n);
     curwp.w_doto = llength(curwp.w_dotp);
-    return (s);
+    return s;
 }
 
 /*
@@ -164,7 +162,7 @@ int forwline(bool f, int n)
 {
     if (n < 0)
         return (backline(f, -n));
-    auto dlp = curwp.w_dotp;
+    LINE* dlp = curwp.w_dotp;
 
     /* Reset goal if last command not backline() or forwline()      */
     if ((lastflag & CFCPCN) == 0)
@@ -203,7 +201,7 @@ int backline(bool f, int n)
 {
     if (n < 0)
         return (forwline(f, -n));
-    auto dlp = curwp.w_dotp;
+    LINE* dlp = curwp.w_dotp;
 
     /* Reset goal if last command not backline() or forwline()      */
     if ((lastflag & CFCPCN) == 0)
@@ -247,14 +245,13 @@ int gotoline(bool f, int n)
  */
 int getgoal(LINE* dlp)
 {
-    int c;
     int col;
     int newcol;
     int dbo;
 
     while (dbo != llength(dlp))
     {
-        c = lgetc(dlp, dbo);
+        int c = lgetc(dlp, dbo);
         newcol = col;
         if (c == '\t')
             newcol |= 0x07;
@@ -266,7 +263,8 @@ int getgoal(LINE* dlp)
         col = newcol;
         ++dbo;
     }
-    return (dbo);
+    
+    return dbo;
 }
 
 /*
@@ -279,15 +277,15 @@ int forwpage(bool f, int n)
 {
     if (f == FALSE)
     {
-        n = curwp.w_ntrows - 2; /* Default scroll.      */
-        if (n <= 0) /* Forget the overlap   */
-            n = 1; /* if tiny window.      */
+        n = curwp.w_ntrows - 2;     /* Default scroll.      */
+        if (n <= 0)                 /* Forget the overlap   */
+            n = 1;                  /* if tiny window.      */
     }
     else if (n < 0)
         return (backpage(f, -n));
-    else if (CVMVAS) /* Convert from pages   */
-        n *= curwp.w_ntrows; /* to lines.            */
-    auto lp = curwp.w_linep;
+    else if (CVMVAS)                /* Convert from pages   */
+        n *= curwp.w_ntrows;        /* to lines.            */
+    LINE* lp = curwp.w_linep;
     while (n-- && lp != curbp.b_linep)
         lp = lforw(lp);
     curwp.w_linep = lp;
@@ -315,14 +313,14 @@ int backpage(bool f, int n)
         return (forwpage(f, -n));
     else if (CVMVAS) /* Convert from pages   */
         n *= curwp.w_ntrows; /* to lines.            */
-    auto lp = curwp.w_linep;
+    LINE* lp = curwp.w_linep;
     while (n-- && lback(lp) != curbp.b_linep)
         lp = lback(lp);
     curwp.w_linep = lp;
     curwp.w_dotp = lp;
     curwp.w_doto = 0;
     curwp.w_flag |= WFHARD;
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -337,7 +335,7 @@ int basic_setmark(bool f, int n)
     /* Get starting column for column regions       */
     markcol = getcol(curwp.w_markp, curwp.w_doto);
     mlwrite("[Mark set]");
-    return (TRUE);
+    return TRUE;
 }
 
 /*************************
@@ -354,7 +352,7 @@ int removemark(bool f, int n)
     }
     else
         mlwrite("[No mark]");
-    return (TRUE);
+    return TRUE;
 }
 
 /*
@@ -368,14 +366,14 @@ int swapmark(bool f, int n)
     if (curwp.w_markp == null)
     {
         mlwrite("No mark in this window");
-        return (FALSE);
+        return FALSE;
     }
-    auto odotp = curwp.w_dotp;
-    auto odoto = curwp.w_doto;
+    LINE* odotp = curwp.w_dotp;
+    int   odoto = curwp.w_doto;
     curwp.w_dotp = curwp.w_markp;
     curwp.w_doto = curwp.w_marko;
     curwp.w_markp = odotp;
     curwp.w_marko = odoto;
     curwp.w_flag |= WFMOVE;
-    return (TRUE);
+    return TRUE;
 }

@@ -25,7 +25,7 @@ import std.conv;
 
 version (Windows)
 {
-    import core.sys.windows.windows;
+    import core.sys.windows.winnt : FILE_ATTRIBUTE_READONLY;
 }
 
 version (Posix)
@@ -123,7 +123,7 @@ int ffchmod(string subject, string image)
         }
         catch (FileException fe)
         {
-            return (FIOSUC);
+            return FIOSUC;
             /* Note that this won't work in all cases, but because  */
             /* this is only called from the backup file creator, it */
             /* will work.  UGLY!!                                   */
@@ -134,8 +134,8 @@ int ffchmod(string subject, string image)
             /* Note the above message is a lie, but because this    */
             /* routine is only called by the backup file creation   */
             /* code, the message will look right to the user.       */
-            return (FIOERR);
+            return FIOERR;
         }
     }
-    return (FIOSUC);
+    return FIOSUC;
 }

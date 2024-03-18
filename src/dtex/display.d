@@ -69,90 +69,95 @@ int display_recalc()
     return TRUE;
 }
 
-version (Windows)
-{
-
 int display_eol_bg(bool f, int n)
 {
-    config.eolattr += 0x10;
-    return display_recalc();
+    version (Windows)
+    {
+        config.eolattr += 0x10;
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_norm_bg(bool f, int n)
 {
-    config.normattr += 0x10;
-    return display_recalc();
+    version (Windows)
+    {
+        config.normattr += 0x10;
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_norm_fg(bool f, int n)
 {
-    config.normattr = (config.normattr & 0xF0) + ((config.normattr + 1) & 0xF);
-    return display_recalc();
+    version (Windows)
+    {
+        config.normattr = (config.normattr & 0xF0) + ((config.normattr + 1) & 0xF);
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_mode_bg(bool f, int n)
 {
-    config.modeattr += 0x10;
-    return display_recalc();
+    version (Windows)
+    {
+        config.modeattr += 0x10;
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_mode_fg(bool f, int n)
 {
-    config.modeattr = (config.modeattr & 0xF0) + ((config.modeattr + 1) & 0xF);
-    return display_recalc();
+    version (Windows)
+    {
+        config.modeattr = (config.modeattr & 0xF0) + ((config.modeattr + 1) & 0xF);
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_mark_bg(bool f, int n)
 {
-    config.markattr += 0x10;
-    return display_recalc();
+    version (Windows)
+    {
+        config.markattr += 0x10;
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int display_mark_fg(bool f, int n)
 {
-    config.markattr = (config.markattr & 0xF0) + ((config.markattr + 1) & 0xF);
-    return display_recalc();
-}
-
-}
-else // Posix
-{
-
-int display_eol_bg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_norm_bg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_norm_fg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_mode_bg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_mode_fg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_mark_bg(bool f, int n)
-{
-    return FALSE;
-}
-
-int display_mark_fg(bool f, int n)
-{
-    return FALSE;
-}
-
+    version (Windows)
+    {
+        config.markattr = (config.markattr & 0xF0) + ((config.markattr + 1) & 0xF);
+        return display_recalc();
+    }
+    else
+    {
+        return FALSE;
+    }
 }
 
 int     sgarbf  = TRUE;                 /* TRUE if screen is garbage */
@@ -373,7 +378,6 @@ void vteeol(int startcol)
 void update()
 {
     LINE* lp;
-    int k;
     int l_first, l_last;
     int scroll_done_flag;
     int wcol;
@@ -1052,12 +1056,6 @@ int HINC(int hi)
  */
 int mlreply(string prompt, string init, out string result)
 {
-    int dot;            /// insertion point in buffer
-    int buflen;         /// number of characters in buffer
-    int startcol;
-    int changes;
-    int hi;
-
     int i;
     int c;
 
@@ -1068,21 +1066,20 @@ int mlreply(string prompt, string init, out string result)
             ++len;
         result = (cast(char*)kbdmop)[0 .. len].idup;
         kbdmop = cast(dchar*)(cast(char*)kbdmop + len + 1);
-        return (len != 0);
+        return len != 0;
     }
 
-    hi = history_top;
-    startcol = 0;
+    int hi = history_top;
+    int startcol;
     attr = config.normattr;
-    changes = 1;
+    int changes = 1;
 
     mpresf = TRUE;
 
-    char[] buf;
     int promptlen = cast(int)prompt.length;
-    buf = init.dup;
-    buflen = cast(int)buf.length;
-    dot = buflen;
+    char[] buf = init.dup;
+    int buflen = cast(int)buf.length;   /// number of characters in buffer
+    int dot = buflen;                   /// insertion point in buffer
 
     for (;;)
     {
@@ -1307,12 +1304,8 @@ void mlwrite(string buffer)
 
 extern (C) void mlwrite(const(char)* fmt, ...)
 {
-    int c;
     char[200 + 1] buffer = void;
-    char* p;
     va_list ap;
-    int savecol;
-
     va_start(ap, fmt);
     int n = vsnprintf(buffer.ptr, buffer.length, fmt, ap);
     va_end(ap);
@@ -1327,7 +1320,7 @@ extern (C) void mlwrite(const(char)* fmt, ...)
     attr = config.normattr;
     vtputs(buffer[0 .. n], 0, 0);
 
-    savecol = vtcol;
+    int savecol = vtcol;
     vteeol(0);
     vtcol = savecol;
     mlchange();

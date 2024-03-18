@@ -186,9 +186,7 @@ TERM term;
 
 void updateline(int row, attchar_t[] buffer, attchar_t[] physical)
 {
-    int col;
     int numcols;
-    CHAR_INFO* psb;
     CHAR_INFO[256] sbbuf;
     CHAR_INFO* sb;
     COORD sbsize;
@@ -209,9 +207,9 @@ void updateline(int row, attchar_t[] buffer, attchar_t[] physical)
     {
         sb = cast(CHAR_INFO*) alloca(numcols * CHAR_INFO.sizeof);
     }
-    for (col = 0; col < numcols; col++)
+    for (int col; col < numcols; col++)
     {
-        auto c = buffer[col].chr;
+        dchar c = buffer[col].chr;
         sb[col].UnicodeChar = cast(WCHAR) c;
         sb[col].Attributes = buffer[col].attr;
         /+if (c >= 0x10000)
@@ -447,26 +445,24 @@ Lret:
     return cNumRead != 0;
 }
 
-extern (C) void popen() { assert(0); }
-
 void setClipboard(const(char)[] s)
 {
-    if (OpenClipboard(null))
+    if (!OpenClipboard(null)) // FALSE clashes with ed.FALSE
+        return;
+
+    EmptyClipboard();
+
+    HGLOBAL hmem = GlobalAlloc(GMEM_MOVEABLE, (s.length + 1) * char.sizeof);
+    if (hmem)
     {
-        EmptyClipboard();
+        char* p = cast(char*)GlobalLock(hmem);
+        memcpy(p, s.ptr, s.length * char.sizeof);
+        p[s.length] = 0;
+        GlobalUnlock(hmem);
 
-        HGLOBAL hmem = GlobalAlloc(GMEM_MOVEABLE, (s.length + 1) * char.sizeof);
-        if (hmem)
-        {
-            char* p = cast(char*)GlobalLock(hmem);
-            memcpy(p, s.ptr, s.length * char.sizeof);
-            p[s.length] = 0;
-            GlobalUnlock(hmem);
-
-            SetClipboardData(CF_TEXT, hmem);
-        }
-        CloseClipboard();
+        SetClipboardData(CF_TEXT, hmem);
     }
+    CloseClipboard();
 }
 
 char[] getClipboard()
@@ -495,6 +491,7 @@ char[] getClipboard()
  * Open browser on help file.
  */
 
+//TODO: Make help() open a help text file instead.
 int help(bool f, int n)
 {
     printf("\nhelp \n");
