@@ -10,15 +10,17 @@ modernizing the code and turning the editor more GNU nano-like.
 
 Changes:
 - [x] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
-- [ ] Correct (the more obvious) warnings emitted by dscanner.
+- [x] Correct (the more obvious) warnings emitted by dscanner.
 - [ ] Document architecture, functions, enums.
-- [ ] Format source to DStyle.
+- [x] Format source to DStyle.
 - [ ] Remove usage of `auto`. Promote usage of `alias`.
 - [ ] Add `--version`.
 - [ ] Add `--help`.
 - [ ] Force dark theme regardless of platform.
 - [ ] Change statusbar to nano's minibar.
+- [ ] Turn TERM functions into standalone functions
 - [ ] Reduce GC and TLS usage.
+- [ ] Stop importing main.
 - [ ] Optional: Make keybinds configurable.
 - [ ] Optional: Add support for duplicating lines.
 - [ ] Optional: Make theme presets.

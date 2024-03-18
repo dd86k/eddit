@@ -1,12 +1,9 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
  * http://www.digitalmars.com/d/
  * This program is in the public domain.
  */
-
 
 /*
  * The routines in this file are called to create a subjob running a command
@@ -25,7 +22,7 @@ import std.process;
 import std.string;
 import std.utf;
 
-version(Posix)
+version (Posix)
 {
     import core.sys.posix.unistd;
 }
@@ -38,8 +35,6 @@ import main;
 import file;
 import terminal;
 
-
-
 /*
  * Create a subjob with a copy of the command intrepreter in it. When the
  * command interpreter exits, mark the screen as garbage so that you do a full
@@ -48,20 +43,20 @@ import terminal;
  */
 int spawncli(bool f, int n)
 {
-    movecursor(term.t_nrow-1, 0);             /* Seek to last line.   */
+    movecursor(term.t_nrow - 1, 0); /* Seek to last line.   */
     version (Windows)
     {
         term.t_flush();
-        auto comspec = core.stdc.stdlib.getenv("COMSPEC");
+        char* comspec = core.stdc.stdlib.getenv("COMSPEC");
         string[] args;
         args ~= to!string(comspec);
         args ~= "COMMAND.COM";
         spawnProcess(args);
     }
-    version (Posix)
+    else version (Posix)
     {
         term.t_flush();
-        term.t_close();                             /* stty to old settings */
+        term.t_close(); /* stty to old settings */
         auto cp = core.stdc.stdlib.getenv("SHELL");
         if (cp && *cp != '\0')
             core.stdc.stdlib.system(cp);
@@ -71,7 +66,7 @@ int spawncli(bool f, int n)
         term.t_open();
     }
     sgarbf = TRUE;
-    return(TRUE);
+    return TRUE;
 }
 
 /*
@@ -81,30 +76,30 @@ int spawncli(bool f, int n)
  */
 int spawn(bool f, int n)
 {
-    int    s;
+    int s;
     string line;
     version (Windows)
     {
-        if ((s=mlreply("MS-DOS command: ", null, line)) != TRUE)
-                return (s);
+        if ((s = mlreply("MS-DOS command: ", null, line)) != TRUE)
+            return (s);
         core.stdc.stdlib.system(toUTF8(line).toStringz());
-        while (term.t_getchar() != '\r')     /* Pause.               */
+        while (term.t_getchar() != '\r') /* Pause.               */
         {
         }
         sgarbf = TRUE;
         return (TRUE);
     }
-    version (Posix)
+    else version (Posix)
     {
-        if ((s=mlreply("! ", null, line)) != TRUE)
-                return (s);
-        term.t_putchar('\n');                /* Already have '\r'    */
+        if ((s = mlreply("! ", null, line)) != TRUE)
+            return (s);
+        term.t_putchar('\n'); /* Already have '\r'    */
         term.t_flush();
-        term.t_close();                              /* stty to old modes    */
+        term.t_close(); /* stty to old modes    */
         core.stdc.stdlib.system(toUTF8(line).toStringz());
         sleep(2);
         term.t_open();
-        printf("[End]");                        /* Pause.               */
+        printf("[End]"); /* Pause.               */
         term.t_flush();
         while ((s = term.t_getchar()) != '\r' && s != ' ')
         {
@@ -120,13 +115,13 @@ int spawn(bool f, int n)
  */
 int spawn_pipe(bool f, int n)
 {
-    int    s;          /* return status from CLI */
-    WINDOW *wp;        /* pointer to new window */
-    BUFFER *bp;        /* pointer to buffer to zot */
+    int s;          /* return status from CLI */
+    WINDOW* wp;     /* pointer to new window */
+    BUFFER* bp;     /* pointer to buffer to zot */
     static string bname = "[DOS]";
 
     static string filnam = "DOS.TMP";
-    string line; /* command line sent to shell */
+    string line;    /* command line sent to shell */
     string sline;
 
     /* get the command to pipe in */
@@ -134,13 +129,14 @@ int spawn_pipe(bool f, int n)
         return s;
 
     /* get rid of the command output buffer if it exists */
-    if ((bp=buffer_find(bname, FALSE, BFTEMP)) != null) /* if buffer exists */
+    if ((bp = buffer_find(bname, FALSE, BFTEMP)) != null) /* if buffer exists */
     {
         /* If buffer is displayed, try to move it off screen            */
         /* (can't remove an on-screen buffer)                           */
-        if (bp.b_nwnd)                 /* if buffer is displayed       */
-        {   if (bp == curbp)            /* if it's the current window   */
-                window_next(FALSE,1);   /* make another window current  */
+        if (bp.b_nwnd) /* if buffer is displayed       */
+        {
+            if (bp == curbp) /* if it's the current window   */
+                window_next(FALSE, 1); /* make another window current  */
             window_only(FALSE, 1);
 
             if (buffer_remove(bp) != TRUE)
@@ -154,32 +150,32 @@ int spawn_pipe(bool f, int n)
 
     sline = toUTF8(line) ~ ">" ~ filnam;
 
-version (Windows)
-{
-    movecursor(term.t_nrow - 2, 0);
-    core.stdc.stdlib.system(sline.toStringz());
-    sgarbf = TRUE;
-    if (std.file.exists(filnam) && std.file.isFile(filnam))
-        return FALSE;
-}
-version (Posix)
-{
-    term.t_putchar('\n');                /* Already have '\r'    */
-    term.t_flush();
-    term.t_close();                              /* stty to old modes    */
-    core.stdc.stdlib.system(sline.toStringz());
-    term.t_open();
-    term.t_flush();
-    sgarbf = TRUE;
-}
+    version (Windows)
+    {
+        movecursor(term.t_nrow - 2, 0);
+        core.stdc.stdlib.system(sline.toStringz());
+        sgarbf = TRUE;
+        if (std.file.exists(filnam) && std.file.isFile(filnam))
+            return FALSE;
+    }
+    else version (Posix)
+    {
+        term.t_putchar('\n'); /* Already have '\r'    */
+        term.t_flush();
+        term.t_close(); /* stty to old modes    */
+        core.stdc.stdlib.system(sline.toStringz());
+        term.t_open();
+        term.t_flush();
+        sgarbf = TRUE;
+    }
 
     /* and read the stuff in */
     if (file_readin(filnam) == FALSE)
-        return(FALSE);
+        return FALSE;
 
     /* and get rid of the temporary file */
     remove(filnam);
-    return(TRUE);
+    return TRUE;
 
 fail:
     return FALSE;
@@ -191,70 +187,70 @@ fail:
  */
 int spawn_filter(bool f, int n)
 {
-        int    s;      /* return status from CLI */
-        BUFFER *bp;    /* pointer to buffer to zot */
-        string line;      /* command line to send to shell */
-        string tmpnam;    /* place to store real file name */
-        string bname1 = "fltinp";
+    int s;          /* return status from CLI */
+    BUFFER* bp;     /* pointer to buffer to zot */
+    string line;    /* command line to send to shell */
+    string tmpnam;  /* place to store real file name */
+    string bname1 = "fltinp";
 
-        string filnam1 = "fltinp";
-        string filnam2 = "fltout";
+    string filnam1 = "fltinp";
+    string filnam2 = "fltout";
 
-        if (curbp.b_flag & BFRDONLY)   /* if buffer is read-only       */
-            return FALSE;               /* fail                         */
+    if (curbp.b_flag & BFRDONLY) /* if buffer is read-only       */
+        return FALSE; /* fail                         */
 
-        /* get the filter name and its args */
-        if ((s=mlreply("Filter:", null, line)) != TRUE)
-                return(s);
+    /* get the filter name and its args */
+    if ((s = mlreply("Filter:", null, line)) != TRUE)
+        return s;
 
-        /* setup the proper file names */
-        bp = curbp;
-        tmpnam = bp.b_fname;    /* save the original name */
-        bp.b_fname = bname1;    /* set it to our new one */
+    /* setup the proper file names */
+    bp = curbp;
+    tmpnam = bp.b_fname; /* save the original name */
+    bp.b_fname = bname1; /* set it to our new one */
 
-        /* write it out, checking for errors */
-        if (writeout(filnam1) != TRUE) {
-                mlwrite("[Cannot write filter file]");
-                bp.b_fname = tmpnam;
-                return(FALSE);
-        }
+    /* write it out, checking for errors */
+    if (writeout(filnam1) != TRUE)
+    {
+        mlwrite("[Cannot write filter file]");
+        bp.b_fname = tmpnam;
+        return FALSE;
+    }
 
-        line ~= " <fltinp >fltout";
+    line ~= " <fltinp >fltout";
     version (Windows)
     {
         movecursor(term.t_nrow - 2, 0);
         core.stdc.stdlib.system(toUTF8(line).toStringz());
     }
-    version (Posix)
+    else version (Posix)
     {
-        term.t_putchar('\n');                /* Already have '\r'    */
+        term.t_putchar('\n'); /* Already have '\r'    */
         term.t_flush();
-        term.t_close();                              /* stty to old modes    */
+        term.t_close(); /* stty to old modes    */
         core.stdc.stdlib.system(toUTF8(line).toStringz());
         term.t_open();
         term.t_flush();
     }
 
-        sgarbf = TRUE;
-        s = TRUE;
+    sgarbf = TRUE;
+    s = TRUE;
 
-        /* on failure, escape gracefully */
-        if (s != TRUE || ((s = readin(filnam2)) == FALSE)) {
-                mlwrite("[Execution failed]");
-                bp.b_fname = tmpnam;
-                goto ret;
-        }
+    /* on failure, escape gracefully */
+    if (s != TRUE || ((s = readin(filnam2)) == FALSE))
+    {
+        mlwrite("[Execution failed]");
+        bp.b_fname = tmpnam;
+        goto ret;
+    }
 
-        /* reset file name */
-        bp.b_fname = tmpnam;           /* restore name */
-        bp.b_flag |= BFCHG;            /* flag it as changed */
-        s = TRUE;
+    /* reset file name */
+    bp.b_fname = tmpnam; /* restore name */
+    bp.b_flag |= BFCHG; /* flag it as changed */
+    s = TRUE;
 
 ret:
-        /* and get rid of the temporary file */
-        remove(toUTF8(filnam1));
-        remove(toUTF8(filnam2));
-        return s;
+    /* and get rid of the temporary file */
+    remove(toUTF8(filnam1));
+    remove(toUTF8(filnam2));
+    return s;
 }
-
-

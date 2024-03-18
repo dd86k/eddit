@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -43,10 +41,10 @@ enum ENOENT = 2;
 
 enum
 {
-    FIOSUC = 0,                      /* File I/O, success.           */
-    FIOFNF = 1,                      /* File I/O, file not found.    */
-    FIOEOF = 2,                      /* File I/O, end of file.       */
-    FIOERR = 3,                      /* File I/O, error.             */
+    FIOSUC = 0, /* File I/O, success.           */
+    FIOFNF = 1, /* File I/O, file not found.    */
+    FIOEOF = 2, /* File I/O, end of file.       */
+    FIOERR = 3, /* File I/O, error.             */
 }
 
 /***************************
@@ -88,26 +86,25 @@ int ffrename(string from, string to)
         version (Posix)
         {
             stat_t buf;
-            if( stat( toStringz(from), &buf ) != -1
-             && !(buf.st_uid == getuid() && (buf.st_mode & octal!200))
-             && !(buf.st_gid == getgid() && (buf.st_mode & octal!20))
-             && !(                          (buf.st_mode & octal!2)) )
+            if (stat(toStringz(from), &buf) != -1
+                && !(buf.st_uid == getuid() &&  (buf.st_mode & octal!200))
+                && !(buf.st_gid == getgid() &&  (buf.st_mode & octal!20))
+                                            && !(buf.st_mode & octal!2))
             {
-                    mlwrite("Cannot open file for writing.");
-                    /* Note the above message is a lie, but because this        */
-                    /* routine is only called by the backup file creation       */
-                    /* code, the message will look right to the user.   */
-                    return( FIOERR );
+                mlwrite("Cannot open file for writing.");
+                /* Note the above message is a lie, but because this        */
+                /* routine is only called by the backup file creation       */
+                /* code, the message will look right to the user.   */
+                return (FIOERR);
             }
         }
-        rename( from, to );
+        rename(from, to);
     }
     catch (Throwable o)
     {
     }
-    return( FIOSUC );
+    return (FIOSUC);
 }
-
 
 /*
  * Change the protection on a file <subject> to match that on file <image>
@@ -126,20 +123,19 @@ int ffchmod(string subject, string image)
         }
         catch (FileException fe)
         {
-                return( FIOSUC );
-                /* Note that this won't work in all cases, but because  */
-                /* this is only called from the backup file creator, it */
-                /* will work.  UGLY!!                                   */
+            return (FIOSUC);
+            /* Note that this won't work in all cases, but because  */
+            /* this is only called from the backup file creator, it */
+            /* will work.  UGLY!!                                   */
         }
-        if (chmod( toStringz(subject), attr ) == -1 )
+        if (chmod(toStringz(subject), attr) == -1)
         {
-                mlwrite("Cannot open file for writing.");
-                /* Note the above message is a lie, but because this    */
-                /* routine is only called by the backup file creation   */
-                /* code, the message will look right to the user.       */
-                return( FIOERR );
+            mlwrite("Cannot open file for writing.");
+            /* Note the above message is a lie, but because this    */
+            /* routine is only called by the backup file creation   */
+            /* code, the message will look right to the user.       */
+            return (FIOERR);
         }
     }
-    return( FIOSUC );
+    return (FIOSUC);
 }
-

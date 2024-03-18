@@ -1,4 +1,3 @@
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -33,11 +32,10 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
 
     switch (syntaxState.syntax)
     {
-        case Syntax.string:
-        case Syntax.singleString:
+    case Syntax.string:
+    case Syntax.singleString:
         {
-            const quote = (syntaxState.syntax == Syntax.string)       ? '"' :
-                                                                        '\'';
+            const quote = (syntaxState.syntax == Syntax.string) ? '"' : '\'';
             const istart = i;
             bool escape;
             while (i < text.length)
@@ -58,7 +56,7 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
             return SyntaxState(syntaxState.syntax);
         }
 
-        case Syntax.comment:
+    case Syntax.comment:
         {
             // it's /* */ comment
             const istart = i;
@@ -76,20 +74,19 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
             return SyntaxState(Syntax.comment);
         }
 
-        default:
-            break;
+    default:
+        break;
     }
 
-  Loop:
-    while (i < text.length)
+    Loop: while (i < text.length)
     {
         const c = text[i];
         switch (c)
         {
-            case 'a': .. case 'z':
-            case 'A': .. case 'Z':
-            case '_':
-            Idstart:
+        case 'a': .. case 'z':
+        case 'A': .. case 'Z':
+        case '_':
+        Idstart:
             {
                 const istart = i;
                 ++i;
@@ -108,7 +105,7 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
                 continue;
             }
 
-            case '/':
+        case '/':
             {
                 const istart = i;
                 ++i;
@@ -140,8 +137,8 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
                 continue;
             }
 
-            case '"':
-            case '\'':
+        case '"':
+        case '\'':
             {
                 const istart = i;
                 bool escape;
@@ -161,16 +158,15 @@ SyntaxState syntaxHighlightCPP(SyntaxState syntaxState, const(char)[] text, attr
                     ++i;
                 }
                 attr[istart .. i] = config.string;
-                return SyntaxState(c == '"'  ? Syntax.string :
-                                               Syntax.singleString);
+                return SyntaxState(c == '"' ? Syntax.string : Syntax.singleString);
             }
 
-            default:
-                if (text[i] & 0x80)
-                    goto Idstart;
-                attr[i] = config.normattr;
-                ++i;
-                continue;
+        default:
+            if (text[i] & 0x80)
+                goto Idstart;
+            attr[i] = config.normattr;
+            ++i;
+            continue;
         }
 /*
         switch (syntaxState.syntax)
@@ -197,99 +193,99 @@ private bool isCPPKeyword(const(char)[] s)
 {
     switch (s)
     {
-        case "alignas":
-        case "const_cast":
-        case "for":
-        case "public":
-        case "thread_local ":
-        case "alignof":
-        case "continue":
-        case "friend":
-        case "register":
-        case "throw":
-        case "asm":
-        case "decltype":
-        case "goto":
-        case "reinterpret_cast":
-        case "true ":
-        case "auto":
-        case "default":
-        case "if":
-        case "requires":
-        case "try ":
-        case "bool":
-        case "delete":
-        case "inline":
-        case "return":
-        case "typedef ":
-        case "break":
-        case "do":
-        case "int":
-        case "short":
-        case "typeid ":
-        case "case":
-        case "double":
-        case "long":
-        case "signed":
-        case "typename ":
-        case "catch":
-        case "dynamic_cast":
-        case "mutable":
-        case "sizeof":
-        case "union ":
-        case "char":
-        case "else":
-        case "namespace":
-        case "static":
-        case "unsigned ":
-        case "char16_t":
-        case "enum":
-        case "new":
-        case "static_assert":
-        case "using ":
-        case "char32_t":
-        case "explicit":
-        case "noexcept":
-        case "static_cast":
-        case "virtual ":
-        case "class":
-        case "export":
-        case "nullptr":
-        case "struct":
-        case "void ":
-        case "concept":
-        case "extern":
-        case "operator":
-        case "switch":
-        case "volatile ":
-        case "const":
-        case "false":
-        case "private":
-        case "template":
-        case "wchar_t ":
-        case "constexpr":
-        case "float":
-        case "protected":
-        case "this":
-        case "while":
+    case "alignas":
+    case "const_cast":
+    case "for":
+    case "public":
+    case "thread_local ":
+    case "alignof":
+    case "continue":
+    case "friend":
+    case "register":
+    case "throw":
+    case "asm":
+    case "decltype":
+    case "goto":
+    case "reinterpret_cast":
+    case "true ":
+    case "auto":
+    case "default":
+    case "if":
+    case "requires":
+    case "try ":
+    case "bool":
+    case "delete":
+    case "inline":
+    case "return":
+    case "typedef ":
+    case "break":
+    case "do":
+    case "int":
+    case "short":
+    case "typeid ":
+    case "case":
+    case "double":
+    case "long":
+    case "signed":
+    case "typename ":
+    case "catch":
+    case "dynamic_cast":
+    case "mutable":
+    case "sizeof":
+    case "union ":
+    case "char":
+    case "else":
+    case "namespace":
+    case "static":
+    case "unsigned ":
+    case "char16_t":
+    case "enum":
+    case "new":
+    case "static_assert":
+    case "using ":
+    case "char32_t":
+    case "explicit":
+    case "noexcept":
+    case "static_cast":
+    case "virtual ":
+    case "class":
+    case "export":
+    case "nullptr":
+    case "struct":
+    case "void ":
+    case "concept":
+    case "extern":
+    case "operator":
+    case "switch":
+    case "volatile ":
+    case "const":
+    case "false":
+    case "private":
+    case "template":
+    case "wchar_t ":
+    case "constexpr":
+    case "float":
+    case "protected":
+    case "this":
+    case "while":
 
-        case "and":
-        case "and_eq":
-        case "bitand":
-        case "bitor":
-        case "compl":
-        case "not ":
-        case "not_eq":
-        case "or":
-        case "or_eq":
-        case "xor":
-        case "xor_eq ":
+    case "and":
+    case "and_eq":
+    case "bitand":
+    case "bitor":
+    case "compl":
+    case "not ":
+    case "not_eq":
+    case "or":
+    case "or_eq":
+    case "xor":
+    case "xor_eq ":
 
-        case "__FILE__":
-        case "__LINE__":
-            return true;
+    case "__FILE__":
+    case "__LINE__":
+        return true;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }

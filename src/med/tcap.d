@@ -10,8 +10,8 @@
 
 module tcap;
 
-version (none)
-{
+version (none):
+
 import ed;
 
 import std.c.stdio;
@@ -661,5 +661,4 @@ int msm_init()
 int mouse_command()
 {
     return 0;           // no mouse input
-}
 }

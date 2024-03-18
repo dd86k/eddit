@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -24,7 +22,7 @@ dchar decodeUTF8(const(char)[] s, ref size_t index)
     const c = s[i];
     if (c <= 0x7F)
     {
-  Lerr:
+    Lerr:
         index = i + 1;
         return c;
     }
@@ -39,10 +37,10 @@ dchar decodeUTF8(const(char)[] s, ref size_t index)
      *      1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
      */
     uint n;
-    for (n = 1; ; ++n)
+    for (n = 1;; ++n)
     {
         if (n > 4)
-            goto Lerr;              // only do the first 4 of 6 encodings
+            goto Lerr; // only do the first 4 of 6 encodings
         if (((c << n) & 0x80) == 0)
         {
             if (n == 1)
@@ -55,7 +53,7 @@ dchar decodeUTF8(const(char)[] s, ref size_t index)
     auto V = cast(dchar)(c & ((1 << (7 - n)) - 1));
 
     if (i + (n - 1) >= s.length)
-        goto Lerr;                  // off end of string
+        goto Lerr; // off end of string
 
     /* The following combinations are overlong, and illegal:
      *      1100000x (10xxxxxx)
@@ -70,13 +68,13 @@ dchar decodeUTF8(const(char)[] s, ref size_t index)
         (c == 0xF0 && (c2 & 0xF0) == 0x80) ||
         (c == 0xF8 && (c2 & 0xF8) == 0x80) ||
         (c == 0xFC && (c2 & 0xFC) == 0x80))
-        goto Lerr;                  // overlong combination
+        goto Lerr; // overlong combination
 
     for (uint j = 1; j != n; ++j)
     {
         const u = s[i + j];
         if ((u & 0xC0) != 0x80)
-            goto Lerr;                      // trailing bytes are 10xxxxxx
+            goto Lerr; // trailing bytes are 10xxxxxx
         V = (V << 6) | (u & 0x3F);
     }
     if (!isValidDchar(V))
@@ -104,13 +102,13 @@ dchar decodeUTF8back(const(char)[] s, ref size_t index)
     const c = s[i];
     if (c <= 0x7F)
     {
-      Lerr:
+    Lerr:
         index = i - 1;
         return c;
     }
 
     uint n;
-    for (size_t j = i; 1; )
+    for (size_t j = i; 1;)
     {
         if (j == 1 || i - j == 4)
             goto Lerr;
@@ -133,7 +131,7 @@ char[] toUTF8(return out char[4] buf, dchar c) nothrow @nogc @safe
 {
     if (c <= 0x7F)
     {
-        buf[0] = cast(char)c;
+        buf[0] = cast(char) c;
         return buf[0 .. 1];
     }
     else if (c <= 0x7FF)
@@ -168,4 +166,3 @@ char[] toUTF8(return out char[4] buf, dchar c) nothrow @nogc @safe
         return buf[0 .. 4];
     }
 }
-

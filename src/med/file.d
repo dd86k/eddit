@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -43,19 +41,20 @@ import random;
  */
 
 int filenext(bool f, int n)
-{       int s;
+{
+    int s;
 
-        if (filesave(f,n) == FALSE)     /* save current file            */
-                return FALSE;
-        if (gargi < gargs.length)       /* if more files on command line */
-        {
-                s = readin(gargs[gargi]);
-                gargi++;
-        }
-        else                            /* get file name from user      */
-                s = fileread(f,n);
-        curbp.b_bname = makename(curbp.b_fname);
-        return s;
+    if (filesave(f, n) == FALSE) /* save current file            */
+        return FALSE;
+    if (gargi < gargs.length) /* if more files on command line */
+    {
+        s = readin(gargs[gargi]);
+        gargi++;
+    }
+    else /* get file name from user      */
+        s = fileread(f, n);
+    curbp.b_bname = makename(curbp.b_fname);
+    return s;
 }
 
 /**********************************
@@ -67,27 +66,27 @@ int Dinsertfile(bool f, int n)
     string fnamed;
 
     if (mlreply("Insert file: ", null, fnamed) == FALSE)
-            return FALSE;
+        return FALSE;
 
     string fname = toUTF8(fnamed);
     try
     {
         fname = std.path.expandTilde(fname);
-        auto fp = File(fname);
+        File fp = File(fname);
         mlwrite("[Reading file]");
         int nline = 0;
         char[] line;
         size_t s;
         while ((s = fp.readln(line)) != 0)
         {
-            foreach(char c; line)
+            foreach (char c; line)
             {
                 if (c == '\r' || c == '\n')
                     break;
-                if (line_insert(1,c) == FALSE)
+                if (line_insert(1, c) == FALSE)
                     return FALSE;
             }
-            if (random_newline(FALSE,1) == FALSE)
+            if (random_newline(FALSE, 1) == FALSE)
                 return FALSE;
             ++nline;
         }
@@ -98,17 +97,21 @@ int Dinsertfile(bool f, int n)
             mlwrite("[Read %d lines]", nline);
         return TRUE;
     }
-    catch (Exception e)
+    catch (Exception ex)
     {
-        mlwrite(e.toString());
+        //TODO: Use .msg
+        mlwrite(ex.toString());
         return FALSE;
     }
+    //TODO: Remove finally usage
+    //      Move return TRUE at function end
     finally
     {
         foreach (wp; windows)
         {
-            if (wp.w_bufp == curbp) {
-                wp.w_flag |= WFMODE|WFHARD;
+            if (wp.w_bufp == curbp)
+            {
+                wp.w_flag |= WFMODE | WFHARD;
             }
         }
     }
@@ -123,12 +126,12 @@ int Dinsertfile(bool f, int n)
  */
 int fileread(bool f, int n)
 {
-        int    s;
-        string fname;
+    int s;
+    string fname;
 
-        if ((s=mlreply("Read file: ", null, fname)) != TRUE)
-                return (s);
-        return (readin(fname));
+    if ((s = mlreply("Read file: ", null, fname)) != TRUE)
+        return (s);
+    return (readin(fname));
 }
 
 /*
@@ -142,18 +145,18 @@ int fileread(bool f, int n)
  */
 int filevisit(bool f, int n)
 {
-        string fname;
+    string fname;
 
-        return  mlreply("Visit file: ", null, fname) &&
-                window_split(f,n) &&
-                file_readin(fname);
+    return mlreply("Visit file: ", null, fname) &&
+        window_split(f, n) &&
+        file_readin(fname);
 }
 
 int file_readin(string fname)
 {
-    LINE   *lp;
-    int    i;
-    int    s;
+    LINE* lp;
+    int i;
+    int s;
     string bname;
 
     /* If there is an existing buffer with the same file name, simply   */
@@ -161,22 +164,23 @@ int file_readin(string fname)
     foreach (bp; buffers)
     {
         /* Always redo temporary buffers, check for filename match.     */
-        if ((bp.b_flag&BFTEMP)==0 && globMatch(bp.b_fname, fname))
+        //TODO: invert statement
+        if ((bp.b_flag & BFTEMP) == 0 && globMatch(bp.b_fname, fname))
         {
             /* If the current buffer now becomes undisplayed            */
             if (--curbp.b_nwnd == 0)
             {
-                curbp.b_dotp  = curwp.w_dotp;
-                curbp.b_doto  = curwp.w_doto;
+                curbp.b_dotp = curwp.w_dotp;
+                curbp.b_doto = curwp.w_doto;
                 curbp.b_markp = curwp.w_markp;
                 curbp.b_marko = curwp.w_marko;
             }
             curbp = bp;
-            curwp.w_bufp  = bp;
-            if (bp.b_nwnd++ == 0)       /* if buffer not already displayed */
+            curwp.w_bufp = bp;
+            if (bp.b_nwnd++ == 0) /* if buffer not already displayed */
             {
-                curwp.w_dotp  = bp.b_dotp;
-                curwp.w_doto  = bp.b_doto;
+                curwp.w_dotp = bp.b_dotp;
+                curwp.w_doto = bp.b_doto;
                 curwp.w_markp = bp.b_markp;
                 curwp.w_marko = bp.b_marko;
             }
@@ -185,10 +189,10 @@ int file_readin(string fname)
                 /* Set dot to be at place where other window has it     */
                 foreach (wp; windows)
                 {
-                    if (wp!=curwp && wp.w_bufp==bp)
+                    if (wp != curwp && wp.w_bufp == bp)
                     {
-                        curwp.w_dotp  = wp.w_dotp;
-                        curwp.w_doto  = wp.w_doto;
+                        curwp.w_dotp = wp.w_dotp;
+                        curwp.w_doto = wp.w_doto;
                         curwp.w_markp = wp.w_markp;
                         curwp.w_marko = wp.w_marko;
                         break;
@@ -198,43 +202,46 @@ int file_readin(string fname)
 
             /* Adjust frame so dot is at center */
             lp = curwp.w_dotp;
-            i = curwp.w_ntrows/2;
-            while (i-- && lback(lp)!=curbp.b_linep)
+            i = curwp.w_ntrows / 2;
+            while (i-- && lback(lp) != curbp.b_linep)
                 lp = lback(lp);
             curwp.w_linep = lp;
 
-            curwp.w_flag |= WFMODE|WFHARD;
+            curwp.w_flag |= WFMODE | WFHARD;
             mlwrite("[Old buffer]");
             return TRUE;
         }
     }
 
-    bname = makename(fname);                 /* New buffer name.     */
+    bname = makename(fname); /* New buffer name.     */
     BUFFER* bp;
-    while ((bp=buffer_find(bname, FALSE, 0)) != null)
+    while ((bp = buffer_find(bname, FALSE, 0)) != null)
     {
         s = mlreply("Buffer name: ", null, bname);
-        if (s == ABORT)                 /* ^G to just quit      */
+        if (s == ABORT) /* ^G to just quit      */
             return (s);
-        if (s == FALSE) {               /* CR to clobber it     */
+        if (s == FALSE)
+        { /* CR to clobber it     */
             bname = makename(fname);
             break;
         }
     }
-    if (bp==null && (bp=buffer_find(bname, TRUE, 0))==null)
-    {   mlwrite("Cannot create buffer");
+    if (bp == null && (bp = buffer_find(bname, TRUE, 0)) == null)
+    {
+        mlwrite("Cannot create buffer");
         return (FALSE);
     }
-    if (--curbp.b_nwnd == 0)                    /* Undisplay            */
-    {   curbp.b_dotp = curwp.w_dotp;
+    if (--curbp.b_nwnd == 0)    /* Undisplay            */
+    {
+        curbp.b_dotp = curwp.w_dotp;
         curbp.b_doto = curwp.w_doto;
         curbp.b_markp = curwp.w_markp;
         curbp.b_marko = curwp.w_marko;
     }
-    curbp = bp;                             /* Switch to it.        */
+    curbp = bp;                 /* Switch to it.        */
     curwp.w_bufp = bp;
     curbp.b_nwnd++;
-    return (readin(fname));                 /* Read it in.          */
+    return (readin(fname));     /* Read it in.          */
 }
 
 /*
@@ -247,19 +254,20 @@ int file_readin(string fname)
  */
 int readin(string dfname)
 {
-    auto bp = curbp;                            // Cheap.
-    auto b = buffer_clear(bp);                  // Might be old.
+    BUFFER* bp = curbp; // Cheap.
+    int     b = buffer_clear(bp); // Might be old.
     if (b != TRUE)
-            return b;
-    bp.b_flag &= ~(BFTEMP|BFCHG);
+        return b;
+    bp.b_flag &= ~(BFTEMP | BFCHG);
     bp.setFilename(dfname);
 
     /* Determine if file is read-only   */
-    auto fname = std.path.expandTilde(toUTF8(dfname));
-    if (ffreadonly(fname))                      /* is file read-only?   */
-            bp.b_flag |= BFRDONLY;
+    string fname = std.path.expandTilde(toUTF8(dfname));
+    //TODO: Turn into ternary
+    if (ffreadonly(fname)) /* is file read-only?   */
+        bp.b_flag |= BFRDONLY;
     else
-            bp.b_flag &= ~BFRDONLY;
+        bp.b_flag &= ~BFRDONLY;
 
     try
     {
@@ -268,7 +276,7 @@ int readin(string dfname)
             mlwrite("[New file]");
             return TRUE;
         }
-        auto fp = File(fname);
+        File fp = File(fname);
         mlwrite("[Reading file]");
         int nline = 0;
         char[] line;
@@ -281,12 +289,13 @@ int readin(string dfname)
             if (line.length && line[$ - 1] == '\r')
                 line = line[0 .. $ - 1];
 
-            LINE   *lp1;
-            LINE   *lp2;
+            LINE* lp1;
+            LINE* lp2;
 
-            if ((lp1=line_realloc(null,0)) == null) {
-                    s = FIOERR;             /* Keep message on the  */
-                    break;                  /* display.             */
+            if ((lp1 = line_realloc(null, 0)) == null)
+            {
+                s = FIOERR; /* Keep message on the  */
+                break; /* display.             */
             }
             lp2 = lback(curbp.b_linep);
             lp2.l_fp = lp1;
@@ -294,7 +303,7 @@ int readin(string dfname)
             lp1.l_bp = lp2;
             curbp.b_linep.l_bp = lp1;
             if (first && line.length >= 3 && line[0] == 0xEF && line[1] == 0xBB && line[2] == 0xBF)
-                line = line[3..$];      // skip BOM
+                line = line[3 .. $]; // skip BOM
             lp1.l_text = line[].dup;
 
             first = false;
@@ -307,23 +316,27 @@ int readin(string dfname)
             mlwrite("[Read %d lines]", nline);
         return TRUE;
     }
-    catch (Exception e)
+    catch (Exception ex)
     {
-        mlwrite(e.toString());
+        //TODO: Use ex.msg
+        mlwrite(ex.toString());
         return FALSE;
     }
+    //TODO: Remove finally usage
+    //      Move return TRUE at function end
     finally
     {
         foreach (wp; windows)
         {
-                if (wp.w_bufp == curbp) {
-                        wp.w_linep = lforw(curbp.b_linep);
-                        wp.w_dotp  = lforw(curbp.b_linep);
-                        wp.w_doto  = 0;
-                        wp.w_markp = null;
-                        wp.w_marko = 0;
-                        wp.w_flag |= WFMODE|WFHARD;
-                }
+            if (wp.w_bufp == curbp)
+            {
+                wp.w_linep = lforw(curbp.b_linep);
+                wp.w_dotp = lforw(curbp.b_linep);
+                wp.w_doto = 0;
+                wp.w_markp = null;
+                wp.w_marko = 0;
+                wp.w_flag |= WFMODE | WFHARD;
+            }
         }
     }
 }
@@ -337,7 +350,7 @@ int readin(string dfname)
  */
 string makename(string fname)
 {
-        return fname;
+    return fname;
 }
 
 /*
@@ -351,23 +364,25 @@ string makename(string fname)
  */
 int filewrite(bool f, int n)
 {
-    int    s;
+    int s;
     string fname;
 
-    if ((s=mlreply("Write file: ", null, fname)) != TRUE)
+    if ((s = mlreply("Write file: ", null, fname)) != TRUE)
         return (s);
-    if (curwp.w_markp)          /* if marking a region  */
-    {   REGION region;
+    if (curwp.w_markp) /* if marking a region  */
+    {
+        REGION region;
 
         if (!getregion(&region))
             return FALSE;
-        return file_writeregion(fname,&region);
+        return file_writeregion(fname, &region);
     }
     else
     {
-        if ((s=writeout(fname)) == TRUE) {
+        if ((s = writeout(fname)) == TRUE)
+        {
             curbp.setFilename(fname);
-            fileunmodify(f,n);
+            fileunmodify(f, n);
         }
     }
     return (s);
@@ -400,19 +415,21 @@ int fileunmodify(bool f, int n)
  */
 int filesave(bool f, int n)
 {
-        WINDOW *wp;
-        int    s;
+    WINDOW* wp;
+    int s;
 
-        if ((curbp.b_flag&BFCHG) == 0)         /* Return, no changes.  */
-                return (TRUE);
-        if (curbp.b_fname.length == 0) {       /* Must have a name.    */
-                mlwrite("No file name");
-                return (FALSE);
-        }
-        if ((s=writeout(curbp.b_fname)) == TRUE) {
-                fileunmodify(f,n);
-        }
-        return (s);
+    if ((curbp.b_flag & BFCHG) == 0) /* Return, no changes.  */
+        return (TRUE);
+    if (curbp.b_fname.length == 0)
+    { /* Must have a name.    */
+        mlwrite("No file name");
+        return (FALSE);
+    }
+    if ((s = writeout(curbp.b_fname)) == TRUE)
+    {
+        fileunmodify(f, n);
+    }
+    return (s);
 }
 
 /*
@@ -422,21 +439,21 @@ int filesave(bool f, int n)
  */
 int filemodify(bool f, int n)
 {
-        int s = TRUE;
+    int s = TRUE;
 
-        auto oldbp = curbp;
-        foreach (bp; buffers)
-        {
-                curbp = bp;
-                if((curbp.b_flag&BFCHG) == 0 || /* if no changes        */
-                   curbp.b_flag & BFTEMP ||     /* if temporary         */
-                   curbp.b_fname.length == 0)   /* Must have a name     */
-                        continue;
-                if((s&=writeout(curbp.b_fname)) == TRUE )
-                        fileunmodify(f,n);
-        }
-        curbp = oldbp;
-        return( s );
+    BUFFER* oldbp = curbp;
+    foreach (bp; buffers)
+    {
+        curbp = bp;
+        if ((curbp.b_flag & BFCHG) == 0 ||  /* if no changes        */
+            curbp.b_flag & BFTEMP ||  /* if temporary         */
+            curbp.b_fname.length == 0) /* Must have a name     */
+            continue;
+        if ((s &= writeout(curbp.b_fname)) == TRUE)
+            fileunmodify(f, n);
+    }
+    curbp = oldbp;
+    return (s);
 }
 
 /*
@@ -449,7 +466,7 @@ int filemodify(bool f, int n)
  */
 int writeout(string dfn)
 {
-    auto fn = std.path.expandTilde(toUTF8(dfn));
+    string fn = std.path.expandTilde(toUTF8(dfn));
     /*
      * Supply backups when writing files.
      */
@@ -464,30 +481,32 @@ int writeout(string dfn)
 
     try
     {
-        std.file.remove(backupname);    // Remove old backup file
+        std.file.remove(backupname); // Remove old backup file
     }
     catch (Throwable o)
     {
     }
 
     if (ffrename(fn, backupname) != FIOSUC)
-            return FALSE;               // Make new backup file
+        return FALSE; // Make new backup file
 
     try
     {
-        auto f = File(fn, "w");
+        File f = File(fn, "w");
 
-        if ( ffchmod( fn, backupname ) != FIOSUC ) /* Set protection    */
-        {       f.close();
-                return( FALSE );
+        if (ffchmod(fn, backupname) != FIOSUC) /* Set protection    */
+        {
+            f.close();
+            return (FALSE);
         }
 
-        auto lp = lforw(curbp.b_linep);             // First line.
-        int nline = 0;                         // Number of lines.
-        while (lp != curbp.b_linep) {
-                f.writeln(toUTF8(lp.l_text[0 .. llength(lp)]));
-                ++nline;
-                lp = lforw(lp);
+        LINE* lp = lforw(curbp.b_linep); // First line.
+        int nline = 0; // Number of lines.
+        while (lp != curbp.b_linep)
+        {
+            f.writeln(toUTF8(lp.l_text[0 .. llength(lp)]));
+            ++nline;
+            lp = lforw(lp);
         }
 
         f.close();
@@ -497,9 +516,10 @@ int writeout(string dfn)
             mlwrite("[Wrote %d lines]", nline);
         return TRUE;
     }
-    catch (Exception e)
+    catch (Exception ex)
     {
-        mlwrite(e.toString());
+        //TODO: Use ex.msg
+        mlwrite(ex.toString());
         return FALSE;
     }
 }
@@ -515,18 +535,18 @@ int writeout(string dfn)
  */
 int filename(bool f, int n)
 {
-        int    s;
-        string fname;
+    int s;
+    string fname;
 
-        if ((s=mlreply("New File Name: ", null, fname)) == ABORT)
-                return (s);
-        curbp.setFilename( s == FALSE ? null : fname);
-        foreach (wp; windows)
-        {       // Update mode lines.
-                if (wp.w_bufp == curbp)
-                        wp.w_flag |= WFMODE;
-        }
-        return (TRUE);
+    if ((s = mlreply("New File Name: ", null, fname)) == ABORT)
+        return (s);
+    curbp.setFilename(s == FALSE ? null : fname);
+    foreach (wp; windows)
+    { // Update mode lines.
+        if (wp.w_bufp == curbp)
+            wp.w_flag |= WFMODE;
+    }
+    return (TRUE);
 }
 
 /*******************************
@@ -535,19 +555,19 @@ int filename(bool f, int n)
 
 int file_writeregion(string dfilename, REGION* region)
 {
-    auto lp = region.r_linep;           /* First line.          */
-    auto loffs = region.r_offset;
-    auto size = region.r_size;
-    int nline = 0;                              /* Number of lines.     */
+    LINE* lp = region.r_linep;      /* First line.          */
+    uint  loffs = region.r_offset;
+    uint  size = region.r_size;
+    int   nline = 0;                /* Number of lines.     */
 
     try
     {
-        auto filename = std.path.expandTilde(toUTF8(dfilename));
-        auto f = File(filename, "w");
+        string filename = std.path.expandTilde(toUTF8(dfilename));
+        File   f = File(filename, "w");
         while (size > 0)
         {
-            auto nchars = llength(lp) - loffs;
-            if (nchars > size)          /* if last line is not a full line */
+            uint nchars = llength(lp) - loffs; // NOTE: was auto
+            if (nchars > size) /* if last line is not a full line */
                 nchars = size;
             f.writeln(toUTF8(lp.l_text[loffs .. loffs + nchars]));
             size -= nchars + 1;
@@ -562,10 +582,10 @@ int file_writeregion(string dfilename, REGION* region)
             mlwrite("[Wrote %d lines]", nline);
         return TRUE;
     }
-    catch (Exception e)
+    catch (Exception ex)
     {
-        mlwrite(e.toString());
+        //TODO: Use ex.msg
+        mlwrite(ex.toString());
         return FALSE;
     }
 }
-

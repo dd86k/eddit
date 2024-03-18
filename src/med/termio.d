@@ -1,4 +1,3 @@
-
 /*
  * The functions in this file negotiate with the operating system for
  * characters, and write characters in a barely buffered fashion on the display.
@@ -6,10 +5,7 @@
 
 module termio;
 
-version (Posix)
-{
-
-import core.stdc.stdio;
+version (Posix)  : import core.stdc.stdio;
 import core.sys.posix.termios;
 import core.sys.posix.sys.ioctl;
 
@@ -17,10 +13,8 @@ import ed;
 
 extern (C) void cfmakeraw(in termios*);
 
-
-termios  ostate;                 /* saved tty state */
-termios  nstate;                 /* values for editor mode */
-
+termios ostate; /* saved tty state */
+termios nstate; /* values for editor mode */
 
 /*
  * This function is called once to set up the terminal device streams.
@@ -29,11 +23,11 @@ termios  nstate;                 /* values for editor mode */
  */
 void ttopen()
 {
-        /* Adjust output channel        */
-        tcgetattr(1, &ostate);                       /* save old state */
-        tcgetattr(1, &nstate);                       /* get base of new state */
-        cfmakeraw(&nstate);
-        tcsetattr(1, TCSADRAIN, &nstate);      /* set mode */
+    /* Adjust output channel        */
+    tcgetattr(1, &ostate); /* save old state */
+    tcgetattr(1, &nstate); /* get base of new state */
+    cfmakeraw(&nstate);
+    tcsetattr(1, TCSADRAIN, &nstate); /* set mode */
 }
 
 /*
@@ -43,7 +37,7 @@ void ttopen()
  */
 void ttclose()
 {
-        tcsetattr(1, TCSADRAIN, &ostate);       // return to original mode
+    tcsetattr(1, TCSADRAIN, &ostate); // return to original mode
 }
 
 /*
@@ -54,7 +48,7 @@ void ttclose()
  */
 void ttputc(char c)
 {
-        fputc(c, stdout);
+    fputc(c, stdout);
 }
 
 /*
@@ -63,7 +57,7 @@ void ttputc(char c)
  */
 void ttflush()
 {
-        fflush(stdout);
+    fflush(stdout);
 }
 
 /*
@@ -73,7 +67,7 @@ void ttflush()
  */
 int ttgetc()
 {
-        return fgetc(stdin);
+    return fgetc(stdin);
 }
 
 /**************************
@@ -82,9 +76,9 @@ int ttgetc()
 
 int ttkeysininput()
 {
-        int n;
-        ioctl(0, FIONREAD, &n);
-        return n != 0;
+    int n;
+    ioctl(0, FIONREAD, &n);
+    return n != 0;
 }
 
 /**************************
@@ -94,6 +88,7 @@ int ttkeysininput()
 void ttwaitkeys()
 {
     import core.sys.posix.sys.select;
+
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(0, &readfds);
@@ -105,6 +100,4 @@ void ttwaitkeys()
 
 void ttyield()
 {
-}
-
 }

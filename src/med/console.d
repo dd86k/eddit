@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -16,7 +14,7 @@ module console;
 
 version (Windows)
 {
-    
+
 pragma(lib, "user32.lib");
 
 import std.stdio;
@@ -28,44 +26,43 @@ import core.sys.windows.winuser;
 import ed;
 import disp;
 
-
 enum BEL = 0x07;                    /* BEL character.               */
 enum ESC = 0x1B;                    /* ESC character.               */
 
-
-static HANDLE hStdin;                   // console input handle
+static HANDLE hStdin;               // console input handle
 static DWORD fdwSaveOldMode;
 
 static INPUT_RECORD lookaheadir;
-static int lookahead;                   // !=0 if data in lookaheadir
+static int lookahead;               // !=0 if data in lookaheadir
 
 /*
  * Standard terminal interface dispatch table. Most of the fields point into
  * "termio" code.
  */
 
-
-
 struct TERM
 {
-    int   t_nrow;              /* Number of rows.              */
-    int   t_ncol;              /* Number of columns.           */
+    int t_nrow; /* Number of rows.              */
+    int t_ncol; /* Number of columns.           */
 
-    void t_open()             /* Open terminal at the start.  */
+    void t_open() /* Open terminal at the start.  */
     {
-        hStdin  = GetStdHandle(STD_INPUT_HANDLE);
+        hStdin = GetStdHandle(STD_INPUT_HANDLE);
         if (hStdin == INVALID_HANDLE_VALUE)
-        {   printf("getstdhandle\n");
+        {
+            printf("getstdhandle\n");
             exit(EXIT_FAILURE);
         }
 
-        if (!GetConsoleMode(hStdin,&fdwSaveOldMode))
-        {   printf("getconsolemode\n");
+        if (!GetConsoleMode(hStdin, &fdwSaveOldMode))
+        {
+            printf("getconsolemode\n");
             exit(EXIT_FAILURE);
         }
 
-        if (!SetConsoleMode(hStdin,ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT))
-        {   printf("setconsolemode\n");
+        if (!SetConsoleMode(hStdin, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT))
+        {
+            printf("setconsolemode\n");
             exit(EXIT_FAILURE);
         }
 
@@ -75,17 +72,18 @@ struct TERM
         t_nrow = disp_state.numrows;
     }
 
-    void t_close()            /* Close terminal at end.       */
+    void t_close() /* Close terminal at end.       */
     {
         disp_close();
 
-        if (!SetConsoleMode(hStdin,fdwSaveOldMode))
-        {   printf("restore console mode\n");
+        if (!SetConsoleMode(hStdin, fdwSaveOldMode))
+        {
+            printf("restore console mode\n");
             exit(EXIT_FAILURE);
         }
     }
 
-    int t_getchar()          /* Get character from keyboard. */
+    int t_getchar() /* Get character from keyboard. */
     {
         INPUT_RECORD buf;
         DWORD cNumRead;
@@ -94,28 +92,30 @@ struct TERM
         while (1)
         {
             if (lookahead)
-            {   buf = lookaheadir;
+            {
+                buf = lookaheadir;
                 lookahead = 0;
             }
-            else if (!ReadConsoleInputW(hStdin,&buf,1,&cNumRead))
-            {   c = 3;                          // ^C
+            else if (!ReadConsoleInputW(hStdin, &buf, 1, &cNumRead))
+            {
+                c = 3; // ^C
                 goto Lret;
             }
 
             switch (buf.EventType)
             {
-                case MOUSE_EVENT:
-                    mstat_update(&buf.MouseEvent);
+            case MOUSE_EVENT:
+                mstat_update(&buf.MouseEvent);
+                continue;
+
+            default:
+                continue; // ignore
+
+            case KEY_EVENT:
+                c = win32_keytran(&buf.KeyEvent);
+                if (!c)
                     continue;
-
-                default:
-                    continue;                   // ignore
-
-                case KEY_EVENT:
-                    c = win32_keytran(&buf.KeyEvent);
-                    if (!c)
-                        continue;
-                    goto Lret;
+                goto Lret;
             }
         }
 
@@ -123,53 +123,53 @@ struct TERM
         return c;
     }
 
-    void t_putchar(int c)          /* Put character to display.    */
+    void t_putchar(int c) /* Put character to display.    */
     {
         disp_putc(c);
     }
 
-    void t_flush()            /* Flush output buffers.        */
+    void t_flush() /* Flush output buffers.        */
     {
         disp_flush();
     }
 
-    void t_move(int row, int col)         /* Move the cursor, origin 0.   */
+    void t_move(int row, int col) /* Move the cursor, origin 0.   */
     {
         disp_move(row, col);
     }
 
-    void t_eeol()             /* Erase to end of line.        */
+    void t_eeol() /* Erase to end of line.        */
     {
         disp_eeol();
     }
 
-    void t_eeop()             /* Erase to end of page.        */
+    void t_eeop() /* Erase to end of page.        */
     {
         disp_eeop();
     }
 
-    void t_beep()             /* Beep.                        */
+    void t_beep() /* Beep.                        */
     {
         disp_putc(BEL);
     }
 
-    void t_standout()         /* Start standout mode          */
+    void t_standout() /* Start standout mode          */
     {
         disp_startstand();
     }
 
-    void t_standend()         /* End standout mode            */
+    void t_standend() /* End standout mode            */
     {
         disp_endstand();
     }
 
-    void t_scrollup()         /* Scroll the screen up         */
+    void t_scrollup() /* Scroll the screen up         */
     {
     }
 
-    void t_scrolldn()         /* Scroll the screen down       */
-                                 /* Note: scrolling routines do  */
-                                 /*  not save cursor position.   */
+    void t_scrolldn() /* Scroll the screen down       */
+    /* Note: scrolling routines do  */
+    /*  not save cursor position.   */
     {
     }
 
@@ -184,37 +184,37 @@ TERM term;
 /********************************************
  */
 
-void updateline(int row,attchar_t[] buffer,attchar_t[] physical)
+void updateline(int row, attchar_t[] buffer, attchar_t[] physical)
 {
     int col;
     int numcols;
-    CHAR_INFO *psb;
+    CHAR_INFO* psb;
     CHAR_INFO[256] sbbuf;
-    CHAR_INFO *sb;
+    CHAR_INFO* sb;
     COORD sbsize;
     static COORD sbcoord;
     SMALL_RECT sdrect;
 
-    sbsize.X = cast(short)disp_state.numcols;
+    sbsize.X = cast(short) disp_state.numcols;
     sbsize.Y = 1;
     sbcoord.X = 0;
     sbcoord.Y = 0;
     sdrect.Left = 0;
-    sdrect.Top = cast(short)row;
+    sdrect.Top = cast(short) row;
     sdrect.Right = cast(short)(disp_state.numcols - 1);
-    sdrect.Bottom = cast(short)row;
+    sdrect.Bottom = cast(short) row;
     numcols = disp_state.numcols;
     sb = sbbuf.ptr;
     if (numcols > sbbuf.length)
     {
-        sb = cast(CHAR_INFO *)alloca(numcols * CHAR_INFO.sizeof);
+        sb = cast(CHAR_INFO*) alloca(numcols * CHAR_INFO.sizeof);
     }
     for (col = 0; col < numcols; col++)
     {
         auto c = buffer[col].chr;
-        sb[col].UnicodeChar = cast(WCHAR)c;
+        sb[col].UnicodeChar = cast(WCHAR) c;
         sb[col].Attributes = buffer[col].attr;
-        if (c >= 0x10000)
+        /+if (c >= 0x10000)
         {
             /* Calculate surrogate pairs, but don't know yet how they
              * work, if at all, with WriteConsoleOutput()
@@ -222,9 +222,9 @@ void updateline(int row,attchar_t[] buffer,attchar_t[] physical)
             auto c0 = cast(wchar)((((c - 0x10000) >> 10) & 0x3FF) + 0xD800);
             auto c1 = cast(wchar)(((c - 0x10000) & 0x3FF) + 0xDC00);
         }
-        //printf("col = %2d, x%2x, '%c'\n",col,sb[col].AsciiChar,sb[col].AsciiChar);
+        printf("col = %2d, x%2x, '%c'\n",col,sb[col].AsciiChar,sb[col].AsciiChar);+/
     }
-    if (!WriteConsoleOutputW(cast(HANDLE)disp_state.handle,sb,sbsize,sbcoord,&sdrect))
+    if (!WriteConsoleOutputW(cast(HANDLE)disp_state.handle, sb, sbsize, sbcoord, &sdrect))
     {
         // error
     }
@@ -232,7 +232,7 @@ void updateline(int row,attchar_t[] buffer,attchar_t[] physical)
 }
 
 /*********************************
- */
+*/
 
 extern (C) int msm_init()
 {
@@ -241,12 +241,20 @@ extern (C) int msm_init()
 
 extern (C)
 {
-    void        msm_term() { }
-    void        msm_showcursor() { }
-    void        msm_hidecursor() { }
+    void msm_term()
+    {
+    }
+
+    void msm_showcursor()
+    {
+    }
+
+    void msm_hidecursor()
+    {
+    }
 }
 
-struct msm_status               // current state of mouse
+struct msm_status // current state of mouse
 {
     uint row;
     uint col;
@@ -259,45 +267,45 @@ msm_status mstat;
  * Fold MOUSE_EVENT into mstat.
  */
 
-static void mstat_update(MOUSE_EVENT_RECORD *pme)
+static void mstat_update(MOUSE_EVENT_RECORD* pme)
 {
     mstat.row = pme.dwMousePosition.Y;
     mstat.col = pme.dwMousePosition.X;
     mstat.buttons = pme.dwButtonState & 3;
 }
 
-extern (C) int msm_getstatus(uint *pcol,uint *prow)
+extern (C) int msm_getstatus(uint* pcol, uint* prow)
 {
     INPUT_RECORD buf;
     DWORD cNumRead;
 
     if (lookahead)
-    {   buf = lookaheadir;
+    {
+        buf = lookaheadir;
         cNumRead = 1;
     }
-    else if (!PeekConsoleInputA(hStdin,&buf,1,&cNumRead))
+    else if (!PeekConsoleInputA(hStdin, &buf, 1, &cNumRead))
         goto Lret;
 
-    if (cNumRead)
-        switch (buf.EventType)
-        {
-            case MOUSE_EVENT:
-                mstat_update(&buf.MouseEvent);
-                goto default;
+    if (cNumRead) switch (buf.EventType)
+    {
+    case MOUSE_EVENT:
+        mstat_update(&buf.MouseEvent);
+        goto default;
 
-            default:
-            Ldiscard:
-                if (lookahead)
-                    lookahead = 0;
-                else
-                    ReadConsoleInputA(hStdin,&buf,1,&cNumRead); // discard
-                break;
+    default:
+    Ldiscard:
+        if (lookahead)
+            lookahead = 0;
+        else
+            ReadConsoleInputA(hStdin, &buf, 1, &cNumRead); // discard
+        break;
 
-            case KEY_EVENT:
-                if (mstat.buttons & 3)
-                    goto Ldiscard;
-                break;
-        }
+    case KEY_EVENT:
+        if (mstat.buttons & 3)
+            goto Ldiscard;
+        break;
+    }
 
 Lret:
     *prow = mstat.row;
@@ -315,10 +323,10 @@ Lret:
  *      https://github.com/dlang/druntime/blob/master/src/core/sys/windows/wincon.d
  */
 
-static uint win32_keytran(KEY_EVENT_RECORD *pkey)
+static uint win32_keytran(KEY_EVENT_RECORD* pkey)
 {
     if (!pkey.bKeyDown)
-        return 0;                               // ignore button up events
+        return 0; // ignore button up events
     uint c = pkey.UnicodeChar;
 /+
     printf("RepeatCount %x VirtualKeyCode %x VirtualScanCode %x UnicodeChar %x AsciiChar %x ControlKeyState %x\n",
@@ -329,31 +337,42 @@ static uint win32_keytran(KEY_EVENT_RECORD *pkey)
     {
         switch (pkey.wVirtualScanCode)
         {
-            case 0x1D:                          // Ctrl
-            case 0x38:                          // Alt
-            case 0x2A:                          // Left Shift
-            case 0x36:                          // Right Shift
-                break;                          // ignore
-            default:
-                c = (pkey.wVirtualScanCode << 8) & 0xFF00;
-                if (pkey.dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+        case 0x1D: // Ctrl
+        case 0x38: // Alt
+        case 0x2A: // Left Shift
+        case 0x36: // Right Shift
+            break; // ignore
+        default:
+            c = (pkey.wVirtualScanCode << 8) & 0xFF00;
+            if (pkey.dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+            {
+                switch (c)
                 {
-                    switch (c)
-                    {   case 0x4700:    c = 0x7700;     break;  // Home
-                        case 0x4F00:    c = 0x7500;     break;  // End
-                        case 0x4900:    c = 0x8400;     break;  // PgUp
-                        case 0x5100:    c = 0x7600;     break;  // PgDn
-                        default:        c = 0;          break;
-                    }
+                case 0x4700:
+                    c = 0x7700;
+                    break; // Home
+                case 0x4F00:
+                    c = 0x7500;
+                    break; // End
+                case 0x4900:
+                    c = 0x8400;
+                    break; // PgUp
+                case 0x5100:
+                    c = 0x7600;
+                    break; // PgDn
+                default:
+                    c = 0;
+                    break;
                 }
-                break;
+            }
+            break;
         }
     }
     else if (pkey.dwControlKeyState & (RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED))
     {
         c = (pkey.wVirtualScanCode << 8) & 0xFF00;
     }
-    
+
     return c;
 }
 
@@ -375,7 +394,7 @@ void ttyield()
     {
         DWORD cNumRead;
 
-        if (!ReadConsoleInputA(hStdin,&lookaheadir,1,&cNumRead))
+        if (!ReadConsoleInputA(hStdin, &lookaheadir, 1, &cNumRead))
         {
             printf("readconsoleinput\n");
             return;
@@ -393,33 +412,34 @@ int ttkeysininput()
     DWORD cNumRead;
 
     if (lookahead)
-    {   buf = lookaheadir;
+    {
+        buf = lookaheadir;
         cNumRead = 1;
     }
-    else if (!PeekConsoleInputA(hStdin,&buf,1,&cNumRead))
+    else if (!PeekConsoleInputA(hStdin, &buf, 1, &cNumRead))
         goto Lret;
 
     if (cNumRead)
     {
         switch (buf.EventType)
         {
-            case MOUSE_EVENT:
-                mstat_update(&buf.MouseEvent);
-                goto default;
+        case MOUSE_EVENT:
+            mstat_update(&buf.MouseEvent);
+            goto default;
 
-            default:
-            Ldiscard:
-                if (lookahead)
-                    lookahead = 0;
-                else
-                    ReadConsoleInputA(hStdin,&buf,1,&cNumRead); // discard
-                cNumRead = 0;
-                break;
+        default:
+        Ldiscard:
+            if (lookahead)
+                lookahead = 0;
+            else
+                ReadConsoleInputA(hStdin, &buf, 1, &cNumRead); // discard
+            cNumRead = 0;
+            break;
 
-            case KEY_EVENT:
-                if (!win32_keytran(&buf.KeyEvent))
-                    goto Ldiscard;
-                break;
+        case KEY_EVENT:
+            if (!win32_keytran(&buf.KeyEvent))
+                goto Ldiscard;
+            break;
         }
     }
 
@@ -438,7 +458,7 @@ void setClipboard(const(char)[] s)
         HGLOBAL hmem = GlobalAlloc(GMEM_MOVEABLE, (s.length + 1) * char.sizeof);
         if (hmem)
         {
-            auto p = cast(char*)GlobalLock(hmem);
+            char* p = cast(char*)GlobalLock(hmem);
             memcpy(p, s.ptr, s.length * char.sizeof);
             p[s.length] = 0;
             GlobalUnlock(hmem);
@@ -455,10 +475,10 @@ char[] getClipboard()
     if (IsClipboardFormatAvailable(CF_TEXT) &&
         OpenClipboard(null))
     {
-        HANDLE h = GetClipboardData(CF_TEXT);   // CF_UNICODETEXT is UTF-16
+        HANDLE h = GetClipboardData(CF_TEXT); // CF_UNICODETEXT is UTF-16
         if (h)
         {
-            auto p = cast(char*)GlobalLock(h);
+            char* p = cast(char*)GlobalLock(h);
             if (p)
             {
                 size_t length = strlen(p);
@@ -497,9 +517,10 @@ int help(bool f, int n)
         if (i + doc.sizeof <= MAX_PATH)
         {
             import std.process;
+
             memcpy(resolved_name.ptr + i, doc.ptr, doc.sizeof);
-    printf("\nhelp2 '%.*s'\n", cast(int)(i + doc.sizeof), resolved_name.ptr);
-            browse(cast(string)resolved_name[0 .. i + doc.sizeof]);
+            printf("\nhelp2 '%.*s'\n", cast(int)(i + doc.sizeof), resolved_name.ptr);
+            browse(cast(string) resolved_name[0 .. i + doc.sizeof]);
         }
     }
     return ed.FALSE;
@@ -521,4 +542,3 @@ int help(bool f, int n)
 }
 
 }
-

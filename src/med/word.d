@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -37,44 +35,47 @@ import display;
  */
 int word_wrap(bool f, int n)
 {
-        int cnt;
-        LINE* oldp;
+    int cnt;
+    LINE* oldp;
 
-        oldp = curwp.w_dotp;
-        cnt = -1;
-        do {
-                cnt++;
-                if (! backchar(false, 1))
-                    goto err;
-        } while (! inword());
-        if (! word_back(false, 1))
+    oldp = curwp.w_dotp;
+    cnt = -1;
+    do
+    {
+        cnt++;
+        if (!backchar(false, 1))
             goto err;
-        /* If still on same line (but not at the beginning)     */
-        if (oldp == curwp.w_dotp && curwp.w_doto)
-        {   int i;
+    }
+    while (!inword());
+    if (!word_back(false, 1))
+        goto err;
+    /* If still on same line (but not at the beginning)     */
+    if (oldp == curwp.w_dotp && curwp.w_doto)
+    {
+        int i;
 
-            if (!random_backdel(false, 1))
-                goto err;
-            if (!random_newline(false, 1))
-                goto err;
-            oldp = lback(curwp.w_dotp);
-            i = 0;
-            while (1)
-            {
-                auto c = lgetc(oldp,i);
-                if (c != ' ' && c != '\t')
-                    break;
-                line_insert(1,c);
-                i++;
-            }
+        if (!random_backdel(false, 1))
+            goto err;
+        if (!random_newline(false, 1))
+            goto err;
+        oldp = lback(curwp.w_dotp);
+        i = 0;
+        while (1)
+        {
+            auto c = lgetc(oldp, i);
+            if (c != ' ' && c != '\t')
+                break;
+            line_insert(1, c);
+            i++;
         }
-        while (inword() == true)
-            if (forwchar(false, 1) == false)
-                goto err;
-        return forwchar(false, cnt);
+    }
+    while (inword() == true)
+        if (forwchar(false, 1) == false)
+            goto err;
+    return forwchar(false, cnt);
 
 err:
-        return false;
+    return false;
 }
 
 /****************************
@@ -97,7 +98,8 @@ int word_wrap_line(bool f, int n)
         goto err;
 
     if (window_marking(curwp))
-    {   REGION region;
+    {
+        REGION region;
         int s;
 
         if ((s = getregion(&region)) != true)
@@ -111,7 +113,7 @@ int word_wrap_line(bool f, int n)
 
     while (n-- > 0)
     {
-      L1:
+    L1:
         col = 0;
         lasti = 0;
         inword = 0;
@@ -133,7 +135,7 @@ int word_wrap_line(bool f, int n)
             {
                 if (!forwchar(0, lasti - curwp.w_doto))
                     goto err;
-                if (!random_newline(0,1))
+                if (!random_newline(0, 1))
                     goto err;
 
                 /* Remove leading whitespace from new line      */
@@ -171,6 +173,7 @@ int word_wrap_line(bool f, int n)
         if (!forwline(0, 1))
             goto err;
     }
+    
     if (window_marking(curwp))
     {
         if (dotosave > llength(dotpsave))
@@ -178,6 +181,7 @@ int word_wrap_line(bool f, int n)
         curwp.w_dotp = dotpsave;
         curwp.w_doto = dotosave;
     }
+    
     return true;
 
 err:
@@ -199,9 +203,9 @@ int word_select(bool f, int n)
     while (s && inword() == inw);
 
     return s &&
-        forwchar(false,1) &&
-        basic_setmark(false,1) &&
-        word_forw(f,n);
+        forwchar(false, 1) &&
+        basic_setmark(false, 1) &&
+        word_forw(f, n);
 }
 
 /******************************
@@ -210,9 +214,9 @@ int word_select(bool f, int n)
 
 int word_lineselect(bool f, int n)
 {
-    return (curwp.w_doto == 0 || gotobol(false,1)) &&
-        basic_setmark(false,1) &&
-        forwline(f,n);
+    return (curwp.w_doto == 0 || gotobol(false, 1)) &&
+        basic_setmark(false, 1) &&
+        forwline(f, n);
 }
 
 /*
@@ -222,18 +226,19 @@ int word_lineselect(bool f, int n)
  */
 int word_back(bool f, int n)
 {
-        if (n < 0)
-                return (word_forw(f, -n));
-        if (backchar(false, 1) == false)
+    if (n < 0)
+        return (word_forw(f, -n));
+    if (backchar(false, 1) == false)
+        return (false);
+    while (n--)
+    {
+        bool inw = inword();
+        do
+            if (backchar(false, 1) == false)
                 return (false);
-        while (n--) {
-            auto inw = inword();
-            do
-                if (backchar(false, 1) == false)
-                    return (false);
-            while (inword() == inw);
-        }
-        return (forwchar(false, 1));
+        while (inword() == inw);
+    }
+    return (forwchar(false, 1));
 }
 
 /*
@@ -242,16 +247,17 @@ int word_back(bool f, int n)
  */
 int word_forw(bool f, int n)
 {
-        if (n < 0)
-                return (word_back(f, -n));
-        while (n--) {
-            auto inw = inword();
-            do
-                if (forwchar(false, 1) == false)
-                    return (false);
-            while (inword() == inw);
-        }
-        return (true);
+    if (n < 0)
+        return (word_back(f, -n));
+    while (n--)
+    {
+        auto inw = inword();
+        do
+            if (forwchar(false, 1) == false)
+                return (false);
+        while (inword() == inw);
+    }
+    return true;
 }
 
 /*
@@ -261,7 +267,7 @@ int word_forw(bool f, int n)
  */
 int word_upper(bool f, int n)
 {
-    return word_setcase(f,n,0);
+    return word_setcase(f, n, 0);
 }
 
 /*
@@ -271,7 +277,7 @@ int word_upper(bool f, int n)
  */
 int word_lower(bool f, int n)
 {
-    return word_setcase(f,n,1);
+    return word_setcase(f, n, 1);
 }
 
 /*************************
@@ -283,47 +289,58 @@ int word_lower(bool f, int n)
 
 int capword(bool f, int n)
 {
-    return word_setcase(f,n,2);
+    return word_setcase(f, n, 2);
 }
 
 private int word_setcase(bool f, int n, int flag)
 {
-    char    c;
+    char c;
 
     if (n < 0)
-        return (false);
-    while (n--) {
-        while (inword() == false) {
+        return false;
+    while (n--)
+    {
+        while (inword() == false)
+        {
             if (forwchar(false, 1) == false)
-                return (false);
+                return false;
         }
-        if (flag == 2 && inword() != false) {
+
+        if (flag == 2 && inword() != false)
+        {
             c = lgetc(curwp.w_dotp, curwp.w_doto);
             if (isLower(c))
-            {   c -= 'a'-'A';
+            {
+                c -= 'a' - 'A';
                 lputc(curwp.w_dotp, curwp.w_doto, c);
                 line_change(WFHARD);
             }
             if (forwchar(false, 1) == false)
-                return (false);
+                return false;
         }
-        while (inword() != false) {
+
+        while (inword() != false)
+        {
             c = lgetc(curwp.w_dotp, curwp.w_doto);
             final switch (flag)
-            {   case 0:
-                    if (isLower(c)) {
-                        c -= 'a'-'A';
-                        goto L1;
-                    }
-                    break;
-                case 1:
-                case 2:
-                    if (isUpper(c)) {
-                        c += 'a'-'A';
-                    L1: lputc(curwp.w_dotp, curwp.w_doto, c);
-                        line_change(WFHARD);
-                    }
-                    break;
+            {
+            case 0:
+                if (isLower(c))
+                {
+                    c -= 'a' - 'A';
+                    goto L1;
+                }
+                break;
+            case 1:
+            case 2:
+                if (isUpper(c))
+                {
+                    c += 'a' - 'A';
+            L1:
+                    lputc(curwp.w_dotp, curwp.w_doto, c);
+                    line_change(WFHARD);
+                }
+                break;
             }
             if (forwchar(false, 1) == false)
                 return (false);
@@ -339,30 +356,33 @@ private int word_setcase(bool f, int n, int flag)
  */
 int delfword(bool f, int n)
 {
-        int    size;
-        LINE*  dotp;
-        int    doto;
+    int size;
+    LINE* dotp;
+    int doto;
 
-        if (n < 0)
+    if (n < 0)
+        return (false);
+    dotp = curwp.w_dotp;
+    doto = curwp.w_doto;
+    size = 0;
+    while (n--)
+    {
+        while (inword() == false)
+        {
+            if (forwchar(false, 1) == false)
                 return (false);
-        dotp = curwp.w_dotp;
-        doto = curwp.w_doto;
-        size = 0;
-        while (n--) {
-                while (inword() == false) {
-                        if (forwchar(false, 1) == false)
-                                return (false);
-                        ++size;
-                }
-                while (inword() != false) {
-                        if (forwchar(false, 1) == false)
-                                return (false);
-                        ++size;
-                }
+            ++size;
         }
-        curwp.w_dotp = dotp;
-        curwp.w_doto = doto;
-        return (line_delete(size, true));
+        while (inword() != false)
+        {
+            if (forwchar(false, 1) == false)
+                return (false);
+            ++size;
+        }
+    }
+    curwp.w_dotp = dotp;
+    curwp.w_doto = doto;
+    return (line_delete(size, true));
 }
 
 /*
@@ -372,28 +392,31 @@ int delfword(bool f, int n)
  */
 int delbword(bool f, int n)
 {
-        int    size;
+    int size;
 
-        if (n < 0)
+    if (n < 0)
+        return false;
+    if (backchar(false, 1) == false)
+        return false;
+    size = 0;
+    while (n--)
+    {
+        while (inword() == false)
+        {
+            if (backchar(false, 1) == false)
                 return (false);
-        if (backchar(false, 1) == false)
-                return (false);
-        size = 0;
-        while (n--) {
-                while (inword() == false) {
-                        if (backchar(false, 1) == false)
-                                return (false);
-                        ++size;
-                }
-                while (inword() != false) {
-                        if (backchar(false, 1) == false)
-                                return (false);
-                        ++size;
-                }
+            ++size;
         }
-        if (forwchar(false, 1) == false)
-                return false;
-        return line_delete(size, true);
+        while (inword() != false)
+        {
+            if (backchar(false, 1) == false)
+                return (false);
+            ++size;
+        }
+    }
+    if (forwchar(false, 1) == false)
+        return false;
+    return line_delete(size, true);
 }
 
 /*
@@ -403,9 +426,9 @@ int delbword(bool f, int n)
  */
 bool inword()
 {
-        if (curwp.w_doto == llength(curwp.w_dotp))
-                return false;
-        auto c = lgetc(curwp.w_dotp, curwp.w_doto);
-        return (isAlphaNum(c) ||
-                 c=='$' || c=='_');     /* For identifiers      */
+    if (curwp.w_doto == llength(curwp.w_dotp))
+        return false;
+    char c = lgetc(curwp.w_dotp, curwp.w_doto);
+    return (isAlphaNum(c) ||
+            c == '$' || c == '_'); /* For identifiers      */
 }

@@ -1,5 +1,3 @@
-
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -42,22 +40,53 @@ import random;
  * and the text. The end of line is not stored as a byte; it's implied. Future
  * additions will include update hints, and a list of marks into the line.
  */
-struct  LINE {
-        LINE *l_fp;             /* Link to the next line        */
-        LINE *l_bp;             /* Link to the previous line    */
-        SyntaxState syntaxState; // state at the beginning of the line
-        char[] l_text;         /* A bunch of characters.       */
+struct LINE
+{
+    LINE* l_fp; /* Link to the next line        */
+    LINE* l_bp; /* Link to the previous line    */
+    SyntaxState syntaxState; // state at the beginning of the line
+    char[] l_text; /* A bunch of characters.       */
 }
 
-LINE* lforw(LINE* lp) { return lp.l_fp; }
-LINE* lback(LINE* lp) { return lp.l_bp; }
-char lputc(LINE* lp, int n, char c) { return lp.l_text[n] = c; }
-int llength(LINE* lp) { return cast(int)lp.l_text.length; }
-char lgetc(LINE* lp, int n) { return lp.l_text[n]; }
-const(char)[] slice(LINE* lp) { return lp.l_text[]; }
+LINE* lforw(LINE* lp)
+{
+    return lp.l_fp;
+}
 
-bool empty(LINE* lp, int n) { return lp == curbp.b_linep; }
-int  front(LINE* lp, int n) { return n == llength(lp) ? '\n' : lgetc(lp, n); }
+LINE* lback(LINE* lp)
+{
+    return lp.l_bp;
+}
+
+char lputc(LINE* lp, int n, char c)
+{
+    return lp.l_text[n] = c;
+}
+
+int llength(LINE* lp)
+{
+    return cast(int) lp.l_text.length;
+}
+
+char lgetc(LINE* lp, int n)
+{
+    return lp.l_text[n];
+}
+
+const(char)[] slice(LINE* lp)
+{
+    return lp.l_text[];
+}
+
+bool empty(LINE* lp, int n)
+{
+    return lp == curbp.b_linep;
+}
+
+int front(LINE* lp, int n)
+{
+    return n == llength(lp) ? '\n' : lgetc(lp, n);
+}
 
 void popFront(ref LINE* lp, ref int n)
 {
@@ -70,7 +99,10 @@ void popFront(ref LINE* lp, ref int n)
     }
 }
 
-bool atFront(LINE* lp, int n) { return n == 0 && lback(lp) == curbp.b_linep; }
+bool atFront(LINE* lp, int n)
+{
+    return n == 0 && lback(lp) == curbp.b_linep;
+}
 
 void popBack(ref LINE* lp, ref int n)
 {
@@ -98,10 +130,10 @@ int peekBack(LINE* lp, int n)
 
 LINE* line_realloc(LINE* lpold, int used)
 {
-        if (!lpold)
-            lpold = new LINE;
-        lpold.l_text.length = used;
-        return lpold;
+    if (!lpold)
+        lpold = new LINE;
+    lpold.l_text.length = used;
+    return lpold;
 }
 
 /*
@@ -112,41 +144,45 @@ LINE* line_realloc(LINE* lpold, int used)
  */
 void line_free(LINE* lp)
 {
-        foreach (wp; windows)
+    foreach (wp; windows)
+    {
+        if (wp.w_linep == lp)
+            wp.w_linep = lp.l_fp;
+        if (wp.w_dotp == lp)
         {
-            if (wp.w_linep == lp)
-                wp.w_linep = lp.l_fp;
-            if (wp.w_dotp  == lp) {
-                wp.w_dotp  = lp.l_fp;
-                wp.w_doto  = 0;
-            }
-            if (wp.w_markp == lp) {
-                wp.w_markp = lp.l_fp;
-                wp.w_marko = 0;
-            }
+            wp.w_dotp = lp.l_fp;
+            wp.w_doto = 0;
         }
-        foreach (bp; buffers)
+        if (wp.w_markp == lp)
         {
-assert(bp);
-            /* If there are windows on this buffer, the dot and mark    */
-            /* values are nonsense.                                     */
-            if (bp.b_nwnd == 0) /* if no windows on this buffer */
+            wp.w_markp = lp.l_fp;
+            wp.w_marko = 0;
+        }
+    }
+    foreach (bp; buffers)
+    {
+        assert(bp);
+        /* If there are windows on this buffer, the dot and mark    */
+        /* values are nonsense.                                     */
+        if (bp.b_nwnd == 0) /* if no windows on this buffer */
+        {
+            /* update dot or mark in the buffer     */
+            if (bp.b_dotp == lp)
             {
-                /* update dot or mark in the buffer     */
-                if (bp.b_dotp  == lp) {
-                        bp.b_dotp = lp.l_fp;
-                        bp.b_doto = 0;
-                }
-                if (bp.b_markp == lp) {
-                        bp.b_markp = lp.l_fp;
-                        bp.b_marko = 0;
-                }
+                bp.b_dotp = lp.l_fp;
+                bp.b_doto = 0;
+            }
+            if (bp.b_markp == lp)
+            {
+                bp.b_markp = lp.l_fp;
+                bp.b_marko = 0;
             }
         }
-        lp.l_bp.l_fp = lp.l_fp;
-        lp.l_fp.l_bp = lp.l_bp;
-        //delete lp;
-        core.memory.GC.free(lp);
+    }
+    lp.l_bp.l_fp = lp.l_fp;
+    lp.l_fp.l_bp = lp.l_bp;
+    //delete lp;
+    core.memory.GC.free(lp);
 }
 
 /*
@@ -158,21 +194,22 @@ assert(bp);
  */
 void line_change(int flag)
 {
-        if (curwp.w_markp)                      /* if marking           */
-            curwp.w_flag |= WFMOVE;             /* so highlighting is updated */
-        if ((curbp.b_flag&(BFCHG|BFRDONLY)) == 0) /* First change, so     */
-        {   flag |= WFMODE;                     /* update mode lines    */
-            curbp.b_flag |= BFCHG;
-        }
-        foreach (wp; windows)
+    if (curwp.w_markp) /* if marking           */
+        curwp.w_flag |= WFMOVE; /* so highlighting is updated */
+    if ((curbp.b_flag & (BFCHG | BFRDONLY)) == 0) /* First change, so     */
+    {
+        flag |= WFMODE; /* update mode lines    */
+        curbp.b_flag |= BFCHG;
+    }
+    foreach (wp; windows)
+    {
+        if (wp.w_bufp == curbp)
         {
-                if (wp.w_bufp == curbp)
-                {
-                    wp.w_flag |= flag;
-                    if (wp != curwp)
-                        wp.w_flag |= WFHARD;
-                }
+            wp.w_flag |= flag;
+            if (wp != curwp)
+                wp.w_flag |= WFHARD;
         }
+    }
 }
 
 /*
@@ -186,60 +223,65 @@ void line_change(int flag)
  */
 int line_insert(int n, char c)
 {
-        LINE   *lp1;
-        LINE   *lp2;
-        LINE   *lp3;
-        int    doto;
+    LINE* lp1;
+    LINE* lp2;
+    LINE* lp3;
+    int   doto;
 
-        if (curbp.b_flag & BFRDONLY)            /* if buffer is read-only */
-            return FALSE;                       /* error                */
-        line_change(WFEDIT);
-        lp1 = curwp.w_dotp;                    /* Current line         */
-        if (lp1 == curbp.b_linep) {            /* At the end: special  */
-                if (curwp.w_doto != 0) {
-                        mlwrite("bug: line_insert");
-                        return (FALSE);
-                }
-                lp2 = line_realloc(null, n);    /* Allocate new line    */
-                lp3 = lp1.l_bp;                /* Previous line        */
-                lp3.l_fp = lp2;                /* Link in              */
-                lp2.l_fp = lp1;
-                lp1.l_bp = lp2;
-                lp2.l_bp = lp3;
-                lp2.l_text[0 .. n] = c;
-                curwp.w_dotp = lp2;
-                curwp.w_doto = n;
-                return (TRUE);
+    if (curbp.b_flag & BFRDONLY) /* if buffer is read-only */
+        return FALSE; /* error                */
+    line_change(WFEDIT);
+    lp1 = curwp.w_dotp; /* Current line         */
+    if (lp1 == curbp.b_linep)
+    { /* At the end: special  */
+        if (curwp.w_doto != 0)
+        {
+            mlwrite("bug: line_insert");
+            return (FALSE);
         }
-        doto = curwp.w_doto;                   /* Save for later.      */
-        lp2 = lp1;
-        lp2.l_text.length = lp2.l_text.length + n;
-
-        memmove(lp2.l_text.ptr + doto + n,
-                lp2.l_text.ptr + doto,
-                (lp2.l_text.length - n - doto) * char.sizeof);
-        if (n == 1)
-            lp2.l_text[doto] = c;
-        else
-            lp2.l_text[doto .. doto + n] = c;
-
-        /* Update windows       */
-        foreach (wp; windows)
-        {   if (wp.w_linep == lp1)
-                    wp.w_linep = lp2;
-            if (wp.w_dotp == lp1) {
-                    wp.w_dotp = lp2;
-                    if (wp==curwp || wp.w_doto>doto)
-                            wp.w_doto += n;
-            }
-            if (wp.w_markp == lp1) {
-                    wp.w_markp = lp2;
-                    if (wp.w_marko > doto)
-                            wp.w_marko += n;
-            }
-        }
-
+        lp2 = line_realloc(null, n); /* Allocate new line    */
+        lp3 = lp1.l_bp; /* Previous line        */
+        lp3.l_fp = lp2; /* Link in              */
+        lp2.l_fp = lp1;
+        lp1.l_bp = lp2;
+        lp2.l_bp = lp3;
+        lp2.l_text[0 .. n] = c;
+        curwp.w_dotp = lp2;
+        curwp.w_doto = n;
         return (TRUE);
+    }
+    doto = curwp.w_doto; /* Save for later.      */
+    lp2 = lp1;
+    lp2.l_text.length = lp2.l_text.length + n;
+
+    memmove(lp2.l_text.ptr + doto + n,
+        lp2.l_text.ptr + doto,
+        (lp2.l_text.length - n - doto) * char.sizeof);
+    if (n == 1)
+        lp2.l_text[doto] = c;
+    else
+        lp2.l_text[doto .. doto + n] = c;
+
+    /* Update windows       */
+    foreach (wp; windows)
+    {
+        if (wp.w_linep == lp1)
+            wp.w_linep = lp2;
+        if (wp.w_dotp == lp1)
+        {
+            wp.w_dotp = lp2;
+            if (wp == curwp || wp.w_doto > doto)
+                wp.w_doto += n;
+        }
+        if (wp.w_markp == lp1)
+        {
+            wp.w_markp = lp2;
+            if (wp.w_marko > doto)
+                wp.w_marko += n;
+        }
+    }
+
+    return (TRUE);
 }
 
 /***************************
@@ -247,13 +289,15 @@ int line_insert(int n, char c)
  */
 
 int line_overwrite(int n, char c)
-{   int status = true;
+{
+    int status = true;
 
     while (n-- > 0)
-    {   if (curwp.w_doto < llength(curwp.w_dotp))
-            status = random_forwdel(FALSE,1);
+    {
+        if (curwp.w_doto < llength(curwp.w_dotp))
+            status = random_forwdel(FALSE, 1);
         if (status)
-            status = line_insert(1,c);
+            status = line_insert(1, c);
         if (!status)
             break;
     }
@@ -270,43 +314,45 @@ int line_overwrite(int n, char c)
  */
 int line_newline()
 {
-        LINE   *lp1;
-        LINE   *lp2;
-        int    doto;
+    LINE* lp1;
+    LINE* lp2;
+    int doto;
 
-        if (curbp.b_flag & BFRDONLY)            /* if buffer is read-only */
-            return FALSE;                       /* error                */
-        lp1  = curwp.w_dotp;                   /* Get the address and  */
-        doto = curwp.w_doto;                   /* offset of "."        */
-        lp2 = line_realloc(null,doto);          /* New first half line  */
-        lp2.l_text[0 .. doto] = lp1.l_text[0 .. doto];
-        memmove(lp1.l_text.ptr, lp1.l_text.ptr + doto, (lp1.l_text.length - doto) * char.sizeof);
-        lp1.l_text.length = lp1.l_text.length - doto;
+    if (curbp.b_flag & BFRDONLY)    /* if buffer is read-only */
+        return FALSE;               /* error                */
+    lp1 = curwp.w_dotp;             /* Get the address and  */
+    doto = curwp.w_doto;            /* offset of "."        */
+    lp2 = line_realloc(null, doto); /* New first half line  */
+    lp2.l_text[0 .. doto] = lp1.l_text[0 .. doto];
+    memmove(lp1.l_text.ptr, lp1.l_text.ptr + doto, (lp1.l_text.length - doto) * char.sizeof);
+    lp1.l_text.length = lp1.l_text.length - doto;
 
-        lp2.l_bp = lp1.l_bp;
-        lp1.l_bp = lp2;
-        lp2.l_bp.l_fp = lp2;
-        lp2.l_fp = lp1;
+    lp2.l_bp = lp1.l_bp;
+    lp1.l_bp = lp2;
+    lp2.l_bp.l_fp = lp2;
+    lp2.l_fp = lp1;
 
-        foreach (wp; windows)
+    foreach (wp; windows)
+    {
+        if (wp.w_linep == lp1)
+            wp.w_linep = lp2;
+        if (wp.w_dotp == lp1)
         {
-                if (wp.w_linep == lp1)
-                        wp.w_linep = lp2;
-                if (wp.w_dotp == lp1) {
-                        if (wp.w_doto < doto)
-                                wp.w_dotp = lp2;
-                        else
-                                wp.w_doto -= doto;
-                }
-                if (wp.w_markp == lp1) {
-                        if (wp.w_marko < doto)
-                                wp.w_markp = lp2;
-                        else
-                                wp.w_marko -= doto;
-                }
+            if (wp.w_doto < doto)
+                wp.w_dotp = lp2;
+            else
+                wp.w_doto -= doto;
         }
-        line_change(WFHARD);
-        return (TRUE);
+        if (wp.w_markp == lp1)
+        {
+            if (wp.w_marko < doto)
+                wp.w_markp = lp2;
+            else
+                wp.w_marko -= doto;
+        }
+    }
+    line_change(WFHARD);
+    return (TRUE);
 }
 
 /*
@@ -317,54 +363,59 @@ int line_newline()
  */
 bool line_delete(int n, bool kflag)
 {
-        LINE*  dotp;
-        int    doto;
-        int    chunk;
+    LINE* dotp;
+    int doto;
+    int chunk;
 
-        if (curbp.b_flag & BFRDONLY)            /* if buffer is read-only */
-            return FALSE;                       /* error                */
-        while (n != 0) {
-                dotp = curwp.w_dotp;
-                doto = curwp.w_doto;
-                if (dotp == curbp.b_linep)     /* Hit end of buffer.   */
-                        return (FALSE);
-                chunk = cast(int)dotp.l_text.length - doto;   /* Size of chunk.       */
-                if (chunk > n)
-                        chunk = n;
-                if (chunk == 0) {               /* End of line, merge.  */
-                        line_change(WFHARD);
-                        if (line_delnewline() == FALSE
-                        || (kflag!=FALSE && kill_appendchar('\n')==FALSE))
-                                return (FALSE);
-                        --n;
-                        continue;
-                }
-                line_change(WFEDIT);
-                if (kflag != FALSE) {           /* Kill?                */
-                    if (!kill_appendstring(dotp.l_text[doto .. doto + chunk]))
-                        return FALSE;
-                }
-                memmove(dotp.l_text.ptr + doto,
-                        dotp.l_text.ptr + doto + chunk,
-                        (dotp.l_text.length - chunk - doto) * char.sizeof);
-                dotp.l_text.length = dotp.l_text.length - chunk;
-
-                foreach (wp; windows)
-                {
-                        if (wp.w_dotp==dotp && wp.w_doto>=doto) {
-                                wp.w_doto -= chunk;
-                                if (wp.w_doto < doto)
-                                        wp.w_doto = doto;
-                        }
-                        if (wp.w_markp==dotp && wp.w_marko>=doto) {
-                                wp.w_marko -= chunk;
-                                if (wp.w_marko < doto)
-                                        wp.w_marko = doto;
-                        }
-                }
-                n -= chunk;
+    if (curbp.b_flag & BFRDONLY) /* if buffer is read-only */
+        return FALSE; /* error                */
+    while (n != 0)
+    {
+        dotp = curwp.w_dotp;
+        doto = curwp.w_doto;
+        if (dotp == curbp.b_linep) /* Hit end of buffer.   */
+            return (FALSE);
+        chunk = cast(int) dotp.l_text.length - doto; /* Size of chunk.       */
+        if (chunk > n)
+            chunk = n;
+        if (chunk == 0)
+        { /* End of line, merge.  */
+            line_change(WFHARD);
+            if (line_delnewline() == FALSE
+                || (kflag != FALSE && kill_appendchar('\n') == FALSE))
+                return (FALSE);
+            --n;
+            continue;
         }
-        return (TRUE);
+        line_change(WFEDIT);
+        if (kflag != FALSE)
+        { /* Kill?                */
+            if (!kill_appendstring(dotp.l_text[doto .. doto + chunk]))
+                return FALSE;
+        }
+        memmove(dotp.l_text.ptr + doto,
+            dotp.l_text.ptr + doto + chunk,
+            (dotp.l_text.length - chunk - doto) * char.sizeof);
+        dotp.l_text.length = dotp.l_text.length - chunk;
+
+        foreach (wp; windows)
+        {
+            if (wp.w_dotp == dotp && wp.w_doto >= doto)
+            {
+                wp.w_doto -= chunk;
+                if (wp.w_doto < doto)
+                    wp.w_doto = doto;
+            }
+            if (wp.w_markp == dotp && wp.w_marko >= doto)
+            {
+                wp.w_marko -= chunk;
+                if (wp.w_marko < doto)
+                    wp.w_marko = doto;
+            }
+        }
+        n -= chunk;
+    }
+    return (TRUE);
 }
 
 /*
@@ -378,54 +429,56 @@ bool line_delete(int n, bool kflag)
  */
 bool line_delnewline()
 {
-        LINE   *lp1;
-        LINE   *lp2;
-        LINE   *lp3;
-        int     lp1used;
+    LINE* lp1;
+    LINE* lp2;
+    LINE* lp3;
+    int lp1used;
 
-        if (curbp.b_flag & BFRDONLY)            /* if buffer is read-only */
-            return FALSE;                       /* error                */
-        lp1 = curwp.w_dotp;
-        lp2 = lp1.l_fp;
-        lp1used = cast(int)lp1.l_text.length;
-        if (lp2 == curbp.b_linep) {            /* At the buffer end.   */
-                if (lp1used == 0)               /* Blank line.          */
-                        line_free(lp1);
-                return (TRUE);
-        }
-        lp3 = line_realloc(lp1, lp1used + cast(int)lp2.l_text.length);
-        lp3.l_bp.l_fp = lp3;
-
-        memmove(lp3.l_text.ptr + lp1used, lp2.l_text.ptr, lp2.l_text.length * char.sizeof);
-        lp3.l_fp = lp2.l_fp;
-        lp3.l_fp.l_bp = lp3;
-
-        foreach (wp; windows)
-        {
-                if (wp.w_linep==lp1 || wp.w_linep==lp2)
-                        wp.w_linep = lp3;
-                if (wp.w_dotp == lp1)
-                        wp.w_dotp  = lp3;
-                else if (wp.w_dotp == lp2) {
-                        wp.w_dotp  = lp3;
-                        wp.w_doto += lp1used;
-                }
-                if (wp.w_markp == lp1)
-                        wp.w_markp  = lp3;
-                else if (wp.w_markp == lp2) {
-                        wp.w_markp  = lp3;
-                        wp.w_marko += lp1used;
-                }
-        }
-
-        //delete lp2.l_text;
-        //delete lp2;
-        core.memory.GC.free(lp2.l_text.ptr);
-        core.memory.GC.free(lp2);
-
+    if (curbp.b_flag & BFRDONLY) /* if buffer is read-only */
+        return FALSE; /* error                */
+    lp1 = curwp.w_dotp;
+    lp2 = lp1.l_fp;
+    lp1used = cast(int) lp1.l_text.length;
+    if (lp2 == curbp.b_linep)
+    { /* At the buffer end.   */
+        if (lp1used == 0) /* Blank line.          */
+            line_free(lp1);
         return (TRUE);
-}
+    }
+    lp3 = line_realloc(lp1, lp1used + cast(int) lp2.l_text.length);
+    lp3.l_bp.l_fp = lp3;
 
+    memmove(lp3.l_text.ptr + lp1used, lp2.l_text.ptr, lp2.l_text.length * char.sizeof);
+    lp3.l_fp = lp2.l_fp;
+    lp3.l_fp.l_bp = lp3;
+
+    foreach (wp; windows)
+    {
+        if (wp.w_linep == lp1 || wp.w_linep == lp2)
+            wp.w_linep = lp3;
+        if (wp.w_dotp == lp1)
+            wp.w_dotp = lp3;
+        else if (wp.w_dotp == lp2)
+        {
+            wp.w_dotp = lp3;
+            wp.w_doto += lp1used;
+        }
+        if (wp.w_markp == lp1)
+            wp.w_markp = lp3;
+        else if (wp.w_markp == lp2)
+        {
+            wp.w_markp = lp3;
+            wp.w_marko += lp1used;
+        }
+    }
+
+    //delete lp2.l_text;
+    //delete lp2;
+    core.memory.GC.free(lp2.l_text.ptr);
+    core.memory.GC.free(lp2);
+
+    return (TRUE);
+}
 
 /********************** KILL BUFFER STUFF *********************/
 
@@ -435,7 +488,7 @@ struct killbuf_t
 }
 
 __gshared killbuf_t[4] killbuffer;
-__gshared killbuf_t *kbp = &killbuffer[0];      /* current kill buffer  */
+__gshared killbuf_t* kbp = &killbuffer[0]; /* current kill buffer  */
 
 /************************************
  * Set the current kill buffer to i.
@@ -448,13 +501,13 @@ void kill_setbuffer(int i)
 
 void kill_toClipboard()
 {
-    version (Windows)
-    {
-        import console;
+version (Windows)
+{
+    import console;
 
-        if (kbp == &killbuffer[0])
-            setClipboard(kbp.buf);
-    }
+    if (kbp == &killbuffer[0])
+        setClipboard(kbp.buf);
+}
 }
 
 /*
@@ -471,20 +524,20 @@ void kill_freebuffer()
 
 void kill_fromClipboard()
 {
-    version (Windows)
-    {
-        import console;
+version (Windows)
+{
+    import console;
 
-        if (kbp == &killbuffer[0])
+    if (kbp == &killbuffer[0])
+    {
+        auto s = getClipboard();
+        if (s)
         {
-            auto s = getClipboard();
-            if (s)
-            {
-                kill_freebuffer();
-                kbp.buf = s;
-            }
+            kill_freebuffer();
+            kbp.buf = s;
         }
     }
+}
 }
 
 /*
@@ -516,7 +569,7 @@ bool kill_appendstring(const char[] s)
  */
 int kill_remove(int n)
 {
-        return (n >= kbp.buf.length) ? -1 : kbp.buf[n];
+    return (n >= kbp.buf.length) ? -1 : kbp.buf[n];
 }
 
 /********************************
@@ -527,7 +580,7 @@ int kill_remove(int n)
 
 int kill_setsize(int size)
 {
-    auto oldlength = kbp.buf.length;
+    size_t oldlength = kbp.buf.length;
     kbp.buf.length = size;
     kbp.buf.length = oldlength;
     return TRUE;

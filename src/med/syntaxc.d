@@ -1,4 +1,3 @@
-
 /* This version of microEmacs is based on the public domain C
  * version written by Dave G. Conroy.
  * The D programming language version is written by Walter Bright.
@@ -33,11 +32,10 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
 
     switch (syntaxState.syntax)
     {
-        case Syntax.string:
-        case Syntax.singleString:
+    case Syntax.string:
+    case Syntax.singleString:
         {
-            const quote = (syntaxState.syntax == Syntax.string)       ? '"' :
-                                                                        '\'';
+            const quote = (syntaxState.syntax == Syntax.string) ? '"' : '\'';
             const istart = i;
             bool escape;
             while (i < text.length)
@@ -58,7 +56,7 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
             return SyntaxState(syntaxState.syntax);
         }
 
-        case Syntax.comment:
+    case Syntax.comment:
         {
             // it's /* */ comment
             const istart = i;
@@ -76,20 +74,19 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
             return SyntaxState(Syntax.comment);
         }
 
-        default:
-            break;
+    default:
+        break;
     }
 
-  Loop:
-    while (i < text.length)
+    Loop: while (i < text.length)
     {
         const c = text[i];
         switch (c)
         {
-            case 'a': .. case 'z':
-            case 'A': .. case 'Z':
-            case '_':
-            Idstart:
+        case 'a': .. case 'z':
+        case 'A': .. case 'Z':
+        case '_':
+        Idstart:
             {
                 const istart = i;
                 ++i;
@@ -108,7 +105,7 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
                 continue;
             }
 
-            case '/':
+        case '/':
             {
                 const istart = i;
                 ++i;
@@ -140,8 +137,8 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
                 continue;
             }
 
-            case '"':
-            case '\'':
+        case '"':
+        case '\'':
             {
                 const istart = i;
                 bool escape;
@@ -161,16 +158,15 @@ SyntaxState syntaxHighlightC(SyntaxState syntaxState, const(char)[] text, attr_t
                     ++i;
                 }
                 attr[istart .. i] = config.string;
-                return SyntaxState(c == '"'  ? Syntax.string :
-                                               Syntax.singleString);
+                return SyntaxState(c == '"' ? Syntax.string : Syntax.singleString);
             }
 
-            default:
-                if (text[i] & 0x80)
-                    goto Idstart;
-                attr[i] = config.normattr;
-                ++i;
-                continue;
+        default:
+            if (text[i] & 0x80)
+                goto Idstart;
+            attr[i] = config.normattr;
+            ++i;
+            continue;
         }
 /*
         switch (syntaxState.syntax)
@@ -197,53 +193,53 @@ private bool isCKeyword(const(char)[] s)
 {
     switch (s)
     {
-        case "break":
-        case "inline":
-        case "void":
-        case "case":
-        case "if":
-        case "int":
-        case "volatile":
-        case "char":
-        case "long":
-        case "while ":
-        case "const":
-        case "register":
-        case "continue":
-        case "restrict":
-        case "default":
-        case "return":
-        case "do":
-        case "short":
-        case "double":
-        case "signed":
-        case "else":
-        case "sizeof":
-        case "enum":
-        case "static":
-        case "extern":
-        case "struct":
-        case "float":
-        case "switch":
-        case "for":
-        case "typedef":
-        case "goto":
-        case "union ":
-        case "_Alignas ":
-        case "_Alignof ":
-        case "_Atomic ":
-        case "_Bool ":
-        case "_Complex ":
-        case "_Generic ":
-        case "_Imaginary ":
-        case "_Noreturn ":
-        case "_Static_assert ":
-        case "_Thread_local ":
-        case "__FILE__":
-        case "__LINE__":
-            return true;
+    case "break":
+    case "inline":
+    case "void":
+    case "case":
+    case "if":
+    case "int":
+    case "volatile":
+    case "char":
+    case "long":
+    case "while ":
+    case "const":
+    case "register":
+    case "continue":
+    case "restrict":
+    case "default":
+    case "return":
+    case "do":
+    case "short":
+    case "double":
+    case "signed":
+    case "else":
+    case "sizeof":
+    case "enum":
+    case "static":
+    case "extern":
+    case "struct":
+    case "float":
+    case "switch":
+    case "for":
+    case "typedef":
+    case "goto":
+    case "union ":
+    case "_Alignas ":
+    case "_Alignof ":
+    case "_Atomic ":
+    case "_Bool ":
+    case "_Complex ":
+    case "_Generic ":
+    case "_Imaginary ":
+    case "_Noreturn ":
+    case "_Static_assert ":
+    case "_Thread_local ":
+    case "__FILE__":
+    case "__LINE__":
+        return true;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 }
