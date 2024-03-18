@@ -912,7 +912,7 @@ version (Windows)
     CONFIG config =
     { // mode, norm, eol, mark, tab, url, search
         // Green on black
-        //0x74,0x02,0x07,0x24,
+        0x74,0x02,0x07,0x24,
         // White on gray
         //0x34,0x7F,0x78,0x3B,
         // Light yellow on black
@@ -922,7 +922,7 @@ version (Windows)
         // Black on gray
         //4,0xF0,0xF0,0x3B,
         // Default: Black on white
-        0x3E, 0xF0, 0xF0, 0x3B,
+        //0x3E, 0xF0, 0xF0, 0x3B,
         ' ',    // tab
         0xF9,   // url
         0xE1,   // search

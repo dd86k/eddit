@@ -12,7 +12,7 @@ Changes:
 - [x] Drop support for Makefiles to rely on DUB. Change recipe to SDLang.
 - [x] Correct (the more obvious) warnings emitted by dscanner.
 - [x] Format source to DStyle.
-- [ ] Change to a dark theme by default. (Windows)
+- [x] Change to a dark theme by default. (Windows)
 - [ ] Remove usage of `auto`. Promote usage of `alias`.
 - [ ] Reduce GC and TLS usage.
 - [ ] Add support for a trace log.
