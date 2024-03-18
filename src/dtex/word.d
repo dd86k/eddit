@@ -62,7 +62,7 @@ int word_wrap(bool f, int n)
         i = 0;
         while (1)
         {
-            auto c = lgetc(oldp, i);
+            char c = lgetc(oldp, i);
             if (c != ' ' && c != '\t')
                 break;
             line_insert(1, c);
@@ -249,7 +249,7 @@ int word_forw(bool f, int n)
         return (word_back(f, -n));
     while (n--)
     {
-        auto inw = inword();
+        bool inw = inword();
         do
             if (forwchar(false, 1) == false)
                 return (false);

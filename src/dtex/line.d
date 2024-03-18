@@ -530,7 +530,7 @@ version (Windows)
 
     if (kbp == &killbuffer[0])
     {
-        auto s = getClipboard();
+        char[] s = getClipboard();
         if (s)
         {
             kill_freebuffer();

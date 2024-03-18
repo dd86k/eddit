@@ -221,7 +221,7 @@ int backsearch(bool f, int n)
         {
             LINE* tlp = clp;
             int tbo = cbo;
-            auto pp = epp;
+            int pp = epp;
 
             while (pp != &pattern[0])
             {

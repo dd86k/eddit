@@ -217,8 +217,8 @@ void updateline(int row, attchar_t[] buffer, attchar_t[] physical)
             /* Calculate surrogate pairs, but don't know yet how they
              * work, if at all, with WriteConsoleOutput()
              */
-            auto c0 = cast(wchar)((((c - 0x10000) >> 10) & 0x3FF) + 0xD800);
-            auto c1 = cast(wchar)(((c - 0x10000) & 0x3FF) + 0xDC00);
+            wchar c0 = cast(wchar)((((c - 0x10000) >> 10) & 0x3FF) + 0xD800);
+            wchar c1 = cast(wchar)(((c - 0x10000) & 0x3FF) + 0xDC00);
         }
         printf("col = %2d, x%2x, '%c'\n",col,sb[col].AsciiChar,sb[col].AsciiChar);+/
     }

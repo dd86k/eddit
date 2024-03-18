@@ -327,7 +327,7 @@ err:
 int openBrowser(bool f, int n)
 {
     LINE* dotp = curwp.w_dotp;
-    auto s = getURL(dotp.l_text[0 .. llength(dotp)], curwp.w_doto);
+    char[] s = getURL(dotp.l_text[0 .. llength(dotp)], curwp.w_doto);
     if (s)
     {
         browse(cast(string)s);

@@ -226,8 +226,8 @@ int window_only(bool f, int n)
     windows = windows[0 .. 1];
     windows[0] = curwp;
 
-    auto lp = curwp.w_linep;
-    auto i = curwp.w_toprow;
+    LINE* lp = curwp.w_linep;
+    int   i = curwp.w_toprow;
     while (i != 0 && lback(lp) != curbp.b_linep)
     {
         --i;

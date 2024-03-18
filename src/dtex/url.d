@@ -61,7 +61,7 @@ size_t isURL(const(char)[] s)
     size_t lastdot;
     for (; i < s.length; i++)
     {
-        auto c = s[i];
+        char c = s[i];
         if (isalnum(c))
             continue;
         if (c == '-' || c == '_' || c == '?' ||

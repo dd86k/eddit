@@ -13,7 +13,7 @@ Changes:
 - [x] Correct (the more obvious) warnings emitted by dscanner.
 - [x] Format source to DStyle.
 - [x] Change to a dark theme by default. (Windows)
-- [ ] Remove usage of `auto`. Promote usage of `alias`.
+- [x] Remove usage of `auto`. Promote usage of `alias`.
 - [ ] Reduce GC and TLS usage.
 - [ ] Add support for a trace log.
 - [ ] Document architecture, functions, enums.

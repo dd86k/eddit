@@ -344,7 +344,7 @@ private int changeindent(bool f, int n, int val)
                     }
                     curwp.w_doto = i + 1;
                     line_delete(j - (i + 1), FALSE);
-                    auto absval = val < 0 ? -val : val;
+                    int absval = val < 0 ? -val : val;
                     line_insert(absval - 1, ' ');
                     break;
                 }

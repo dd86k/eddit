@@ -266,9 +266,8 @@ void vtputc(dchar c, int startcol, int tabbase, attr_t attr)
     }
     else if (c == '\t')
     {
-        auto i = hardtabsize - ((vtcol - tabbase) % hardtabsize);
-        do
-            vtputc(config.tabchar, startcol, tabbase, attr);
+        int i = hardtabsize - ((vtcol - tabbase) % hardtabsize);
+        do vtputc(config.tabchar, startcol, tabbase, attr);
         while (--i);
     }
     else if (SHOWCONTROL && (c < 0x20 || c == 0x7F))
@@ -567,7 +566,7 @@ void update()
                                 highlight == Language.D ? syntaxHighlightD(lp.syntaxState, lp.l_text, lineAttr) : highlight == Language.C ? syntaxHighlightC(
                                     lp.syntaxState, lp.l_text, lineAttr) : syntaxHighlightCPP(lp.syntaxState, lp
                                         .l_text, lineAttr);
-                            auto lpn = lforw(lp);
+                            LINE* lpn = lforw(lp);
                             if (lpn != wp.w_bufp.b_linep) /* if not end of buffer */
                             {
                                 nextLine |= lpn.syntaxState != nextState;
@@ -609,8 +608,8 @@ void update()
                             const cattr = (highlight != Language.text && attr == config.normattr)
                                 ? lineAttr[j] : attr;
 
-                            auto b = inURL(lp.l_text[], j);
-                            auto s = inSearch(lp.l_text[], j);
+                            int   b = inURL(lp.l_text[], j);
+                            bool  s = inSearch(lp.l_text[], j);
                             dchar c = decodeUTF8(lp.l_text, j);
                             if (attr == config.normattr && (b || s))
                                 vtputc(c, wp.w_startcol, 0, s ? config.searchattr : config.urlattr);
@@ -823,8 +822,8 @@ void updateline(int row, attchar_t[] vline, attchar_t[] pline)
     attchar_t* cp5;
     int nbflag;
 
-    auto cp1 = &vline[0]; /* Compute left match.  */
-    auto cp2 = &pline[0];
+    LINE* cp1 = &vline[0]; /* Compute left match.  */
+    LINE* cp2 = &pline[0];
 
     while (cp1 != vline.ptr + term.t_ncol && cp1[0] == cp2[0])
     {
