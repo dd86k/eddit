@@ -18,9 +18,10 @@ Changes:
 - [ ] Add `--help`.
 - [ ] Force dark theme regardless of platform.
 - [ ] Change statusbar to nano's minibar.
-- [ ] Turn TERM functions into standalone functions
+- [ ] Turn TERM structure functions into standalone functions.
 - [ ] Reduce GC and TLS usage.
 - [ ] Stop importing main.
+- [ ] 
 - [ ] Optional: Make keybinds configurable.
 - [ ] Optional: Add support for duplicating lines.
 - [ ] Optional: Make theme presets.
