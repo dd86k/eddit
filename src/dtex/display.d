@@ -822,8 +822,8 @@ void updateline(int row, attchar_t[] vline, attchar_t[] pline)
     attchar_t* cp5;
     int nbflag;
 
-    LINE* cp1 = &vline[0]; /* Compute left match.  */
-    LINE* cp2 = &pline[0];
+    attchar_t* cp1 = &vline[0]; /* Compute left match.  */
+    attchar_t* cp2 = &pline[0];
 
     while (cp1 != vline.ptr + term.t_ncol && cp1[0] == cp2[0])
     {
