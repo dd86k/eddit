@@ -1,9 +1,26 @@
-name "dtex"
+name "eddit"
 description "MicroEmacs fork written in D"
-homepage "https://github.com/dd86k/dtex"
+homepage "https://github.com/dd86k/eddit"
 authors "Dave G. Conroy" "Walter Bright" "dd86k"
 license "public domain"
 targetType "executable"
-targetName "dtex"
-sourcePaths "src/dtex"
-importPaths "src/dtex"
+targetName "eddit"
+sourcePaths "src/eddit"
+importPaths "src/eddit"
+
+buildType "trace" {
+	versions "TRACE"
+}
+
+buildType "debugv" {
+	buildOptions "debugMode"
+	dflags "-vgc" "-vtls" platform="dmd"
+	dflags "--vgc" "--transition=lts" platform="ldc"
+	dflags "-ftransition=nogc" "-ftransition=tls" platform="gdc"
+}
+
+buildType "static" {
+	buildOptions "releaseMode" "noBoundsCheck" "optimize"
+	dflags "-static" platform="gdc"
+	dflags "--static" platform="ldc"
+}
